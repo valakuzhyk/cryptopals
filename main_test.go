@@ -11,7 +11,7 @@ import (
 	"sort"
 	"testing"
 
-	"../cryptopals/utils"
+	"github.com/valakuzhyk/cryptopals/utils"
 )
 
 func TestSet1Challenge6(t *testing.T) {

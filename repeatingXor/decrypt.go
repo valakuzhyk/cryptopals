@@ -4,7 +4,7 @@ import (
 	"math"
 	"unicode"
 
-	"../utils"
+	"github.com/valakuzhyk/cryptopals/utils"
 )
 
 var MIN_KEYSIZE = 2
