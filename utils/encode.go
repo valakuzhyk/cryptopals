@@ -11,19 +11,19 @@ func DecodeEnglishFrom1ByteXor(bytes []byte) (uint8, string) {
 		decodedStrings[key] = string(RepeatingXor(bytes, []byte{byte(key)}))
 	}
 
-	maxScore := float32(0)
-	maxString := ""
-	maxKey := uint8(0)
+	minScore := float32(math.MaxFloat32)
+	minString := ""
+	minKey := uint8(0)
 	for key, s := range decodedStrings {
 		score := EnglishScore(s)
-		if score > maxScore {
-			maxScore = score
-			maxKey = key
-			maxString = s
+		if score < minScore {
+			minScore = score
+			minKey = key
+			minString = s
 		}
 	}
 
-	return maxKey, maxString
+	return minKey, minString
 }
 
 func BytesToBase64(bytes []byte) string {
