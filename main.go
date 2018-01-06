@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"../crypto/utils"
+	"../cryptopals/utils"
 )
 
 func main() {

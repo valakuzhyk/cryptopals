@@ -7,14 +7,16 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"sort"
 	"testing"
 
-	"../crypto/utils"
+	"../cryptopals/utils"
 )
 
 func TestSet1Challenge6(t *testing.T) {
-	base64Str, err := ioutil.ReadFile("/home/kevin/Documents/crypto/data/Set1Challenge6.txt")
+	absPath, _ := filepath.Abs("../cryptopals/data/Set1Challenge6.txt")
+	base64Str, err := ioutil.ReadFile(absPath)
 	if err != nil {
 		t.Fatal("Unable to open data file")
 	}
@@ -38,7 +40,8 @@ func TestSet1Challenge5(t *testing.T) {
 }
 
 func TestSet1Challenge4(t *testing.T) {
-	file, err := os.Open("/home/kevin/Documents/crypto/data/Set1Challenge4.txt")
+	absPath, _ := filepath.Abs("../cryptopals/data/Set1Challenge4.txt")
+	file, err := os.Open(absPath)
 	if err != nil {
 		t.Fatal("Unable to open data file")
 	}
