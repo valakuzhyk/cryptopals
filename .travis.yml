@@ -1,7 +1,7 @@
 language: go
 
 install: 
-- go build main.go
+- go build -u -v ./...
 
 script:
 - go test -v ./...
