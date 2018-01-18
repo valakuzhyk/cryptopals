@@ -41,13 +41,10 @@ func EnglishScore(s string) float64 {
 		} else if unicode.IsDigit(c) {
 			chi2 += float64(100 * count)
 		} else if strings.ContainsAny(string(c), "<>{}[]()~|%^*#%@&-/`=+_\\") {
-			penalty := 50
-			for i := 0; i < count; i++ {
-				penalty *= 2
-			}
+			penalty := 100 * count
 			chi2 += float64(penalty)
 		} else if _, ok := englishFreq[c]; !ok {
-			defaultPenalty := float64(10 * count)
+			defaultPenalty := float64(20 * count)
 			chi2 += defaultPenalty
 		}
 	}

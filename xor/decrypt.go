@@ -21,8 +21,21 @@ type Solution struct {
 // Decrypt attempts to identify identify the plaintext for a ciphertext that has been
 // xored with an arbitrary length byte string.
 func Decrypt(ciphertext []byte) Solution {
+	bestKey, keyScores := identifyKeysize(ciphertext)
+
+	solution := DecryptWithKeysize(ciphertext, bestKey)
+	keyScore := keyScores[len(solution.Key)]
+	solution.KeyScore = keyScore
+
+	return solution
+}
+
+// DecryptAllKeys attempts to identify identify the plaintext for a ciphertext that has been
+// xored with an arbitrary length byte string. Returns the best result for each keylength.
+func DecryptAllKeys(ciphertext []byte) []Solution {
 	topSolutions := []Solution{}
-	keyScores := identifyKeysize(ciphertext)
+	_, keyScores := identifyKeysize(ciphertext)
+
 	for i := MIN_KEYSIZE; i < MAX_KEYSIZE; i++ {
 		solution := DecryptWithKeysize(ciphertext, i)
 		keyScore := keyScores[len(solution.Key)]
@@ -35,7 +48,7 @@ func Decrypt(ciphertext []byte) Solution {
 		return topSolutions[i].KeyScore < topSolutions[j].KeyScore
 	})
 
-	return topSolutions[0]
+	return topSolutions
 }
 
 // DecryptWithKeysize takes a ciphertext and the keysize and tries to identify the
@@ -43,19 +56,21 @@ func Decrypt(ciphertext []byte) Solution {
 func DecryptWithKeysize(ciphertext []byte, likelyKeysize int) Solution {
 	guessedKey := make([]byte, likelyKeysize)
 	plaintextPieces := make([]string, likelyKeysize)
-	avgScore := float64(0)
+	maxScore := float64(0)
 	for keyIdx := 0; keyIdx < likelyKeysize; keyIdx++ {
 		nthChars := utils.CollectEveryNthRune(string(ciphertext[keyIdx:]), likelyKeysize)
 		soln := DecodeEnglishFrom1ByteXor([]byte(nthChars))
 		guessedKey[keyIdx] = soln.Key[0]
 		plaintextPieces[keyIdx] = string(soln.Plaintext)
-		avgScore += soln.EnglishScore / float64(likelyKeysize)
+		if maxScore < soln.EnglishScore {
+			maxScore = soln.EnglishScore
+		}
 	}
 
 	return Solution{
 		Key:          guessedKey,
 		Plaintext:    reconstructPlaintextFromPieces(plaintextPieces),
-		EnglishScore: avgScore,
+		EnglishScore: maxScore,
 	}
 }
 
@@ -102,7 +117,7 @@ func DecodeEnglishFrom1ByteXor(bytes []byte) Solution {
 	}
 }
 
-func identifyKeysize(ciphertext []byte) map[int]float64 {
+func identifyKeysize(ciphertext []byte) (int, map[int]float64) {
 	// Take chunks of the guessed key size, and find the normalized hamming distance between them.
 	editDistMap := make(map[int]float64)
 	for keySize := MIN_KEYSIZE; keySize < MAX_KEYSIZE; keySize++ {
@@ -119,9 +134,13 @@ func identifyKeysize(ciphertext []byte) map[int]float64 {
 		editDistMap[keySize] = float64(totalNormalizedEditDist) / float64(numSamples)
 	}
 	fmt.Println("Printing keysize Scores")
-	printSortedScores(editDistMap)
+	keys := getSortedScores(editDistMap)
+	for _, k := range keys {
+		fmt.Printf(" %d: %f\n", k, editDistMap[k])
+	}
+	fmt.Println()
 
-	return editDistMap
+	return keys[0], editDistMap
 }
 
 func printSortedScores(scores map[int]float64) {
@@ -133,8 +152,17 @@ func printSortedScores(scores map[int]float64) {
 	sort.Slice(keys, func(i, j int) bool {
 		return scores[keys[i]] < scores[keys[j]]
 	})
-	for _, k := range keys {
-		fmt.Printf(" %d: %f\n", k, scores[k])
+
+}
+
+func getSortedScores(scores map[int]float64) []int {
+	keys := []int{}
+	for k := range scores {
+		keys = append(keys, k)
 	}
-	fmt.Println()
+
+	sort.Slice(keys, func(i, j int) bool {
+		return scores[keys[i]] < scores[keys[j]]
+	})
+	return keys
 }

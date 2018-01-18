@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"sort"
@@ -15,6 +14,10 @@ import (
 	"github.com/valakuzhyk/cryptopals/utils"
 	"github.com/valakuzhyk/cryptopals/xor"
 )
+
+func TestSet1Challenge7(t *testing.T) {
+
+}
 
 func TestSet1Challenge6(t *testing.T) {
 	absPath, _ := filepath.Abs("../cryptopals/data/Set1Challenge6.txt")
@@ -120,21 +123,6 @@ Play that funky music
 				t.Errorf("Line1: %s\nLine2: %s\n", lines1[i], lines2[i])
 			}
 		}
-	}
-}
-
-func TestSet1Challenge5Reverse(t *testing.T) {
-	ciphertext := "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f"
-	bytes, err := hex.DecodeString(ciphertext)
-	if err != nil {
-		log.Fatal("Unable to parse hex string.")
-	}
-	soln := xor.Decrypt(bytes)
-	got := soln.Plaintext
-	want := "Burning 'em, if you ain't quick and nimble\n" +
-		"I go crazy when I hear a cymbal"
-	if got != want {
-		t.Fatal("Incorrect key and plaintext", soln.Key, got)
 	}
 }
 
