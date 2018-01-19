@@ -16,7 +16,6 @@ import (
 )
 
 func TestSet1Challenge7(t *testing.T) {
-
 }
 
 func TestSet1Challenge6(t *testing.T) {

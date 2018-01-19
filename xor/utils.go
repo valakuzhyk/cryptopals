@@ -1,11 +1,13 @@
 package xor
 
 import "log"
+import "runtime/debug"
 
 // Xor returns the xor of two, same size byte lists.
 func Xor(b1, b2 []byte) []byte {
 	if len(b1) != len(b2) {
-		log.Fatalln("Buffers do not match, cannot compute xor")
+		debug.PrintStack()
+		log.Fatalf("Buffers do not match, cannot compute xor, %d vs %d\n", len(b1), len(b2))
 	}
 	output := make([]byte, len(b1))
 	for i := range b1 {
