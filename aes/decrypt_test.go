@@ -7,37 +7,6 @@ import (
 	"testing"
 )
 
-// func Test_blockCipher_Encrypt(t *testing.T) {
-// 	type args struct {
-// 		dst []byte
-// 		src []byte
-// 	}
-// 	tests := []struct {
-// 		name string
-// 		key  []byte
-// 		args args
-// 	}{
-// 		{
-// 			"first",
-// 			[]byte{0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c},
-// 			args{[]byte{}, []byte{0x32, 0x43, 0xf6, 0xa8, 0x88, 0x5a, 0x30, 0x8d, 0x31, 0x31, 0x98, 0xa2, 0xe0, 0x37, 0x07, 0x34}}},
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			b, err := NewBlockCipher(tt.key, 128)
-// 			if err != nil {
-// 				t.Fatal("Error in block cipher creation.", err)
-// 			}
-// 			b.Encrypt(tt.args.dst, tt.args.src)
-// 			enc := utils.BytesToBase64(tt.args.dst)
-// 			fmt.Println(enc)
-// 			if enc == "" {
-// 				t.Fatal("Failure")
-// 			}
-// 		})
-// 	}
-// }
-
 func Test_blockCipher_KeyExpansion(t *testing.T) {
 	type fields struct {
 		key   []byte
