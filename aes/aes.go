@@ -3,6 +3,7 @@ package aes
 import (
 	"errors"
 	"fmt"
+	"log"
 	"strings"
 )
 
@@ -56,5 +57,26 @@ func xpow(pow int) byte {
 	for i := 0; i < pow; i++ {
 		output = xtime(output)
 	}
+	return output
+}
+
+func multiply(worda, wordb byte) byte {
+	// assume that wordb is the smaller one
+	output := byte(0)
+	log.Println("Begin")
+	log.Printf("%X %X %X\n", worda, wordb, output)
+	powX := wordb
+	for worda != 0 {
+		if worda&1 == 1 {
+			output ^= powX
+		}
+		powX = xtime(powX)
+		worda = worda >> 1
+		log.Println("Another iter")
+		log.Printf("%X %X %X\n", worda, wordb, output)
+	}
+	log.Println("Done")
+	log.Printf("%X %X %X\n", worda, wordb, output)
+
 	return output
 }

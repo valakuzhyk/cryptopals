@@ -36,12 +36,7 @@ func mixColumn(col, mixer []byte) []byte {
 	for row := range col {
 		newRowVal := byte(0)
 		for i, mixVal := range mixer {
-			if mixVal&1 != 0 {
-				newRowVal ^= col[i]
-			}
-			if mixVal&2 != 0 {
-				newRowVal ^= xtime(col[i])
-			}
+			newRowVal ^= multiply(col[i], mixVal)
 		}
 		newColumn[row] = newRowVal
 		mixer = utils.ShiftBytesRight(mixer, 1)

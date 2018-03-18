@@ -42,9 +42,33 @@ func initState(in []byte) [][]byte {
 	return state
 }
 
-func invShiftRows()  {}
-func invSubBytes()   {}
-func invMixColumns() {}
+func (b blockCipher) invShiftRows() {
+	for rowIdx, row := range b.state {
+		b.state[rowIdx] = utils.ShiftBytesRight(row, rowIdx)
+	}
+}
+func (b blockCipher) invSubBytes() {
+	for rowIdx, row := range b.state {
+		b.state[rowIdx] = invSubWord(row)
+	}
+}
+
+func invSubWord(word []byte) []byte {
+	output := make([]byte, len(word))
+	for i, val := range word {
+		output[i] = invSBox[val]
+	}
+	return output
+}
+
+func (b blockCipher) invMixColumns() {
+	mixer := []byte{0xe, 0xb, 0xd, 0x9}
+	for i := 0; i < b.state.NumCols(); i++ {
+		col := b.state.GetColumn(i)
+		newColumn := mixColumn(col, mixer)
+		b.state.SetColumn(i, newColumn)
+	}
+}
 
 func rotWord(word []byte) []byte {
 	return utils.ShiftBytesLeft(word, 1)

@@ -16,6 +16,16 @@ import (
 )
 
 func TestSet1Challenge7(t *testing.T) {
+	absPath, _ := filepath.Abs("../cryptopals/data/Set1Challenge7.txt")
+	base64Str, err := ioutil.ReadFile(absPath)
+	if err != nil {
+		t.Fatal("Unable to open data file")
+	}
+	_, err = utils.Base64ToBytes(string(base64Str))
+	if err != nil {
+		t.Fatal("Failed to decode string", err)
+	}
+
 }
 
 func TestSet1Challenge6(t *testing.T) {
