@@ -16,7 +16,21 @@ type blockCipher struct {
 	n_r   int
 }
 
-func (b blockCipher) Decrypt(dst, src []byte) {
+func (b *blockCipher) Decrypt(dst, src []byte) {
+	w := b.KeyExpansion(b.key)
+	b.state = initState(src)
+	b.addRoundKey(w.GetColumns(b.n_r*_Nb, (b.n_r+1)*_Nb))
+
+	for round := b.n_r - 1; round > 0; round-- {
+		b.invShiftRows()
+		b.invSubBytes()
+		b.addRoundKey(w.GetColumns(round*_Nb, (round+1)*_Nb))
+		b.invMixColumns()
+	}
+	b.invShiftRows()
+	b.invSubBytes()
+	b.addRoundKey(w.GetColumns(0, _Nb))
+	b.extractOutput(dst)
 }
 
 func (b blockCipher) BlockSize() int {
@@ -76,28 +90,6 @@ func rotWord(word []byte) []byte {
 
 func rCon(i int) []byte {
 	return []byte{xpow(i - 1), byte(0x0), byte(0x0), byte(0x0)}
-}
-
-func (b blockCipher) KeyExpansion(key []byte) byteMat {
-	w := make(byteMat, _Nb)
-	for i := range w {
-		w[i] = make([]byte, _Nb*(b.n_r+1))
-	}
-	for i := 0; i < b.n_k; i++ {
-		w.SetColumn(i, key[4*i:4*i+4])
-	}
-
-	var temp []byte
-	for i := b.n_k; i < _Nb*(b.n_r+1); i++ {
-		temp = w.GetColumn(i - 1)
-		if i%b.n_k == 0 {
-			temp = xor.Xor(subWord(rotWord(temp)), rCon(i/b.n_k))
-		} else if b.n_k > 6 && i%b.n_k == 4 {
-			temp = subWord(temp)
-		}
-		w.SetColumn(i, xor.Xor(w.GetColumn(i-b.n_k), temp))
-	}
-	return w
 }
 
 func (b blockCipher) addRoundKey(roundKey byteMat) {

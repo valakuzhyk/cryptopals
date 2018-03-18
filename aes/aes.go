@@ -3,8 +3,9 @@ package aes
 import (
 	"errors"
 	"fmt"
-	"log"
 	"strings"
+
+	"github.com/valakuzhyk/cryptopals/xor"
 )
 
 func NewBlockCipher(key []byte, mode int) (*blockCipher, error) {
@@ -30,6 +31,28 @@ func NewBlockCipher(key []byte, mode int) (*blockCipher, error) {
 		n_k: n_k,
 		n_r: n_r,
 	}, nil
+}
+
+func (b blockCipher) KeyExpansion(key []byte) byteMat {
+	w := make(byteMat, _Nb)
+	for i := range w {
+		w[i] = make([]byte, _Nb*(b.n_r+1))
+	}
+	for i := 0; i < b.n_k; i++ {
+		w.SetColumn(i, key[4*i:4*i+4])
+	}
+
+	var temp []byte
+	for i := b.n_k; i < _Nb*(b.n_r+1); i++ {
+		temp = w.GetColumn(i - 1)
+		if i%b.n_k == 0 {
+			temp = xor.Xor(subWord(rotWord(temp)), rCon(i/b.n_k))
+		} else if b.n_k > 6 && i%b.n_k == 4 {
+			temp = subWord(temp)
+		}
+		w.SetColumn(i, xor.Xor(w.GetColumn(i-b.n_k), temp))
+	}
+	return w
 }
 
 func (b blockCipher) extractOutput(dst []byte) {
@@ -63,8 +86,6 @@ func xpow(pow int) byte {
 func multiply(worda, wordb byte) byte {
 	// assume that wordb is the smaller one
 	output := byte(0)
-	log.Println("Begin")
-	log.Printf("%X %X %X\n", worda, wordb, output)
 	powX := wordb
 	for worda != 0 {
 		if worda&1 == 1 {
@@ -72,11 +93,7 @@ func multiply(worda, wordb byte) byte {
 		}
 		powX = xtime(powX)
 		worda = worda >> 1
-		log.Println("Another iter")
-		log.Printf("%X %X %X\n", worda, wordb, output)
 	}
-	log.Println("Done")
-	log.Printf("%X %X %X\n", worda, wordb, output)
 
 	return output
 }
