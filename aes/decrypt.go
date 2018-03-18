@@ -1,8 +1,6 @@
 package aes
 
 import (
-	"fmt"
-
 	"github.com/valakuzhyk/cryptopals/xor"
 
 	"github.com/valakuzhyk/cryptopals/utils"
@@ -56,21 +54,24 @@ func rCon(i int) []byte {
 	return []byte{xpow(i - 1), byte(0x0), byte(0x0), byte(0x0)}
 }
 
-func (b blockCipher) KeyExpansion(key []byte) [][]byte {
-	w := make([][]byte, _Nb*(b.n_r+1))
+func (b blockCipher) KeyExpansion(key []byte) byteMat {
+	w := make(byteMat, _Nb)
+	for i := range w {
+		w[i] = make([]byte, _Nb*(b.n_r+1))
+	}
 	for i := 0; i < b.n_k; i++ {
-		w[i] = key[4*i : 4*i+4]
+		w.SetColumn(i, key[4*i:4*i+4])
 	}
 
 	var temp []byte
 	for i := b.n_k; i < _Nb*(b.n_r+1); i++ {
-		temp = w[i-1]
+		temp = w.GetColumn(i - 1)
 		if i%b.n_k == 0 {
 			temp = xor.Xor(subWord(rotWord(temp)), rCon(i/b.n_k))
 		} else if b.n_k > 6 && i%b.n_k == 4 {
 			temp = subWord(temp)
 		}
-		w[i] = xor.Xor(w[i-b.n_k], temp)
+		w.SetColumn(i, xor.Xor(w.GetColumn(i-b.n_k), temp))
 	}
 	return w
 }
@@ -79,7 +80,6 @@ func (b blockCipher) addRoundKey(roundKey byteMat) {
 	for colIdx := 0; colIdx < b.state.NumCols(); colIdx++ {
 		col := b.state.GetColumn(colIdx)
 		roundKeyCol := roundKey.GetColumn(colIdx)
-		fmt.Println(col, roundKeyCol)
 		newCol := xor.Xor(col, roundKeyCol)
 		b.state.SetColumn(colIdx, newCol)
 	}

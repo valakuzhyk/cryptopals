@@ -17,6 +17,14 @@ func (b byteMat) NumCols() int {
 	return len(b[0])
 }
 
+func (b byteMat) GetColumns(i, j int) byteMat {
+	columns := make(byteMat, b.NumRows())
+	for rowIdx, row := range b {
+		columns[rowIdx] = row[i:j]
+	}
+	return columns
+}
+
 func (b byteMat) GetColumn(i int) []byte {
 	col := make([]byte, b.NumRows())
 	for rowIdx, row := range b {
@@ -32,7 +40,7 @@ func (b byteMat) SetColumn(i int, newCol []byte) {
 }
 
 func (b byteMat) String() string {
-	outputStr := "Printing byteMap\n"
+	outputStr := "Printing byteMap \n"
 	for _, row := range b {
 		for _, val := range row {
 			outputStr += fmt.Sprintf("%X ", val)

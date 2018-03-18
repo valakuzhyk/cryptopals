@@ -5,20 +5,19 @@ import (
 )
 
 // Encrypt takes data and encrypts it given the current blockCipher settings.
-func (b blockCipher) Encrypt(dst, src []byte) {
+func (b *blockCipher) Encrypt(dst, src []byte) {
 	w := b.KeyExpansion(b.key)
 	b.state = initState(src)
-	b.addRoundKey(w[0:_Nb])
-
+	b.addRoundKey(w.GetColumns(0, _Nb))
 	for round := 1; round < b.n_r; round++ {
 		b.subBytes()
 		b.shiftRows()
 		b.mixColumns()
-		b.addRoundKey(w[round*_Nb : (round+1)*_Nb])
+		b.addRoundKey(w.GetColumns(round*_Nb, (round+1)*_Nb))
 	}
 	b.subBytes()
 	b.shiftRows()
-	b.addRoundKey(w[b.n_r*_Nb : (b.n_r+1)*_Nb])
+	b.addRoundKey(w.GetColumns(b.n_r*_Nb, (b.n_r+1)*_Nb))
 
 	b.extractOutput(dst)
 }
