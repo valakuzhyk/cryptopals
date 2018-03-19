@@ -1,4 +1,4 @@
-package main
+package data
 
 // SongLyrics are a common answer in these challenges.
 const SongLyrics = `I'm back and I'm ringin' the bell 

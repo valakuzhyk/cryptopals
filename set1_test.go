@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"sort"
@@ -12,9 +13,33 @@ import (
 	"testing"
 
 	"github.com/valakuzhyk/cryptopals/aes"
+	"github.com/valakuzhyk/cryptopals/data"
 	"github.com/valakuzhyk/cryptopals/utils"
 	"github.com/valakuzhyk/cryptopals/xor"
 )
+
+func TestSet1Challenge8(t *testing.T) {
+	absPath, _ := filepath.Abs("../cryptopals/data/Set1Challenge8.txt")
+	hexStrs, err := ioutil.ReadFile(absPath)
+	if err != nil {
+		t.Fatal("Unable to open data file")
+	}
+
+	hexStrSlice := strings.Split(string(hexStrs), "\n")
+	maxRepeatStr := ""
+	maxRepeatCount := 0
+	for _, s := range hexStrSlice {
+		repeatCount := utils.CountRepeats(s, 32)
+		if repeatCount > maxRepeatCount {
+			maxRepeatStr = s
+			maxRepeatCount = repeatCount
+		}
+	}
+	log.Println(maxRepeatStr)
+	if maxRepeatCount == 0 {
+		t.Fatal("Couldn't find a repeat")
+	}
+}
 
 func TestSet1Challenge7(t *testing.T) {
 	absPath, _ := filepath.Abs("../cryptopals/data/Set1Challenge7.txt")
@@ -34,11 +59,11 @@ func TestSet1Challenge7(t *testing.T) {
 		t.Fatal("Unable to create aes block cipher")
 	}
 
-	ecbEncrypter := utils.NewECBDecrypter(blockCipher)
+	ecbDecrypter := utils.NewECBDecrypter(blockCipher)
 
 	output := make([]byte, len(fileData))
-	ecbEncrypter.CryptBlocks(output, fileData)
-	if !strings.HasPrefix(string(output), SongLyrics) {
+	ecbDecrypter.CryptBlocks(output, fileData)
+	if !strings.HasPrefix(string(output), data.SongLyrics) {
 		t.Fatal("Answer is not correct")
 	}
 }
@@ -86,10 +111,10 @@ func TestSet1Challenge6(t *testing.T) {
 	}
 	solutions := xor.Decrypt(ciphertext)
 
-	if solutions.Plaintext != SongLyrics {
+	if solutions.Plaintext != data.SongLyrics {
 		t.Log("Plaintext does not match the desired output\n")
 		lines1 := strings.Split(solutions.Plaintext, "\n")
-		lines2 := strings.Split(SongLyrics, "\n")
+		lines2 := strings.Split(data.SongLyrics, "\n")
 		if len(lines1) != len(lines2) {
 			t.Fatal("They don't even have the same number of lines...")
 		}

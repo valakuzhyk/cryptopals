@@ -50,3 +50,18 @@ func (d ecbDecrypter) CryptBlocks(dst, src []byte) {
 		d.blockCipher.Decrypt(dst[i:i+d.BlockSize()], src[i:i+d.BlockSize()])
 	}
 }
+
+// CountRepeats is used to see how many repeating blocks are present
+// in a string. Used to check if ECB encoding was used.
+func CountRepeats(s string, blockSize int) int {
+	blockCounts := make(map[string]int)
+	// 32 chars is 16 bytes, check how many repeat
+	for i := 0; i+blockSize <= len(s); i += blockSize {
+		block := s[i : i+blockSize]
+		blockCounts[block]++
+	}
+
+	expectedBlocks := len(s) / blockSize
+	numBlocks := len(blockCounts)
+	return expectedBlocks - numBlocks
+}
