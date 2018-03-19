@@ -6,9 +6,6 @@ import (
 	"github.com/valakuzhyk/cryptopals/utils"
 )
 
-const blockLength = 128
-const _Nb = blockLength / 32
-
 type blockCipher struct {
 	key   []byte
 	state byteMat
@@ -31,14 +28,6 @@ func (b *blockCipher) Decrypt(dst, src []byte) {
 	b.invSubBytes()
 	b.addRoundKey(w.GetColumns(0, _Nb))
 	b.extractOutput(dst)
-}
-
-func (b blockCipher) BlockSize() int {
-	return blockLength
-}
-
-func (b blockCipher) CryptBlocks(dst, src []byte) {
-
 }
 
 func initState(in []byte) [][]byte {

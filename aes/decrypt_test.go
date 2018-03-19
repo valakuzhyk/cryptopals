@@ -31,7 +31,7 @@ func Test_blockCipher_Decrypt(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			b, err := NewBlockCipher(tt.key, 128)
+			b, err := NewBlockCipher(tt.key)
 			if err != nil {
 				t.Fatal("Error in block cipher creation.", err)
 			}

@@ -1,30 +1,36 @@
 package aes
 
 import (
-	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/valakuzhyk/cryptopals/xor"
 )
 
-func NewBlockCipher(key []byte, mode int) (*blockCipher, error) {
+const blockLength = 128
+const _Nb = blockLength / 32
+
+// Returns the size of each block in bytes
+func (b *blockCipher) BlockSize() int {
+	return blockLength / 8
+}
+
+func NewBlockCipher(key []byte) (*blockCipher, error) {
 	var n_k int
 	var n_r int
-	switch mode {
-	case 128:
+	switch len(key) {
+	case 16: // AES-128
 		n_k = 4
 		n_r = 10
-	case 192:
+	case 24: // AES-192
 		n_k = 6
 		n_r = 12
-	case 256:
+	case 32: // AES-256
 		n_k = 8
 		n_r = 14
 	default:
-		return nil, errors.New("Only valid modes are 128, 192, and 256")
+		return nil, fmt.Errorf("Invalid key size of %d", len(key))
 	}
-	key = append(key, []byte(strings.Repeat(" ", mode-len(key)))...)
+	// key = append(key, []byte(strings.Repeat(" ", mode-len(key)))...)
 
 	return &blockCipher{
 		key: key,
@@ -56,12 +62,13 @@ func (b blockCipher) KeyExpansion(key []byte) byteMat {
 }
 
 func (b blockCipher) extractOutput(dst []byte) {
+	idx := 0
 	for col := range b.state[0] {
 		for row := range b.state {
-			dst = append(dst, b.state[row][col])
+			dst[idx] = b.state[row][col]
+			idx++
 		}
 	}
-	fmt.Println(dst)
 }
 
 // xtime is an abstraction over multiplying a polynomial by x.

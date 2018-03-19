@@ -91,7 +91,7 @@ func Test_blockCipher_KeyExpansion(t *testing.T) {
 				t.Fatal("couldn't decode string")
 			}
 			fmt.Println(key)
-			b, err := NewBlockCipher(key, 128)
+			b, err := NewBlockCipher(key)
 			if err != nil {
 				t.Fatal("couldn't create block cipher")
 			}

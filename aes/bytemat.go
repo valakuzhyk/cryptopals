@@ -49,10 +49,3 @@ func (b byteMat) String() string {
 	}
 	return outputStr
 }
-
-func PrintBytes(bytes []byte) {
-	for _, b := range bytes {
-		fmt.Printf("%X ", b)
-	}
-	fmt.Println()
-}
