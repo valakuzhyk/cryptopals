@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// AddPKCS7Padding adds padding to the
+// AddPKCS7Padding adds padding according to https://tools.ietf.org/html/rfc5652#section-6.3
 func AddPKCS7Padding(s string, blockSize int) string {
 	if blockSize >= 256 {
 		log.Fatalf("You can't use PKCS7 padding with a blocksize greater than 256. You chose %d", blockSize)
