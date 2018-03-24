@@ -1,4 +1,4 @@
-package utils
+package vcipher
 
 import (
 	"crypto/cipher"

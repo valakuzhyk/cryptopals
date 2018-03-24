@@ -18,3 +18,4 @@ It makes it seem like you can't have an odd multiple of the blocksize after padd
 
 ## Set 2
 ### Challenge 10: Implement CBC Mode
+After having already implemented ECB mode, this was quite trivial. The wikipedia page's image on how information flows made this a little more straightforward, as the wording for this challenge was not very clear at all.

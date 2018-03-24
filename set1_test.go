@@ -15,6 +15,7 @@ import (
 	"github.com/valakuzhyk/cryptopals/aes"
 	"github.com/valakuzhyk/cryptopals/data"
 	"github.com/valakuzhyk/cryptopals/utils"
+	"github.com/valakuzhyk/cryptopals/vcipher"
 	"github.com/valakuzhyk/cryptopals/xor"
 )
 
@@ -29,7 +30,7 @@ func TestSet1Challenge8(t *testing.T) {
 	maxRepeatStr := ""
 	maxRepeatCount := 0
 	for _, s := range hexStrSlice {
-		repeatCount := utils.CountRepeats(s, 32)
+		repeatCount := vcipher.CountRepeats(s, 32)
 		if repeatCount > maxRepeatCount {
 			maxRepeatStr = s
 			maxRepeatCount = repeatCount
@@ -59,7 +60,7 @@ func TestSet1Challenge7(t *testing.T) {
 		t.Fatal("Unable to create aes block cipher")
 	}
 
-	ecbDecrypter := utils.NewECBDecrypter(blockCipher)
+	ecbDecrypter := vcipher.NewECBDecrypter(blockCipher)
 
 	output := make([]byte, len(fileData))
 	ecbDecrypter.CryptBlocks(output, fileData)
@@ -78,7 +79,7 @@ func TestECBModeAES(t *testing.T) {
 		t.Fatal("Unable to create aes block cipher")
 	}
 
-	ecbEncrypter := utils.NewECBEncrypter(blockCipher)
+	ecbEncrypter := vcipher.NewECBEncrypter(blockCipher)
 
 	encrypted := make([]byte, len(input))
 	ecbEncrypter.CryptBlocks(encrypted, input)
@@ -89,7 +90,7 @@ func TestECBModeAES(t *testing.T) {
 		t.Fatal("Unable to create aes block cipher")
 	}
 
-	ecbDecrypter := utils.NewECBDecrypter(blockCipher2)
+	ecbDecrypter := vcipher.NewECBDecrypter(blockCipher2)
 
 	output := make([]byte, len(encrypted))
 	ecbDecrypter.CryptBlocks(output, encrypted)
