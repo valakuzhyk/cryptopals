@@ -53,3 +53,8 @@ func TestSet2Challenge10(t *testing.T) {
 		t.Fatal("Answer is not correct")
 	}
 }
+
+func TestSet2Challenge11(t *testing.T) {
+	// Implement ECB/CBC oraacle
+
+}
