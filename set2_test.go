@@ -13,11 +13,27 @@ import (
 	"github.com/valakuzhyk/cryptopals/vcipher"
 )
 
+func TestSet2Challenge12(t *testing.T) {
+	unknownString := "Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkgaGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBqdXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUgYnkK"
+	unknownBytes, err := utils.Base64ToBytes(unknownString)
+	if err != nil {
+		log.Fatal("Couldn't decode base64: ", err)
+	}
+	e := vcipher.AppendEncrypter{}
+	e.SetEndBytes(unknownBytes)
+	e.RandomizeKey()
+	e.SetEncryptionMode(vcipher.ECB_MODE)
+	bytes := vcipher.IdentifyHiddenAppendedBytes(e)
+	if string(bytes) != string(unknownBytes) {
+		t.Fatal("unable to find the appended bytes by iterative decoding")
+	}
+}
+
 func TestSet2Challenge11(t *testing.T) {
 	// Implement ECB/CBC oracle
 	randomEncrypter := vcipher.RandomEncrypter{}
 	wantMode := randomEncrypter.SetEncryptionMode(vcipher.RANDOM)
-	getMode := vcipher.ECBvsCBCOracle(randomEncrypter.Encrypt)
+	getMode := vcipher.ECBvsCBCOracle(randomEncrypter.EncryptwithRandomKey)
 	if wantMode != getMode {
 		t.Fatalf("Wanted %d, got %d", wantMode, getMode)
 	}

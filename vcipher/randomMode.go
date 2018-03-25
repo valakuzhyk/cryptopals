@@ -36,6 +36,7 @@ func ECBvsCBCOracle(encrypterFunction func(input []byte) []byte) EncryptionMode 
 
 type RandomEncrypter struct {
 	Mode EncryptionMode
+	Key  []byte
 }
 
 // SetEncryptionMode sets what kind of encryption the Encrypt function does.
@@ -52,19 +53,15 @@ func (e *RandomEncrypter) SetEncryptionMode(newMode EncryptionMode) EncryptionMo
 	return e.Mode
 }
 
-// RandomEncrypter randomly pads information given and encodes in either
-// ECB or CBC mode.
+// RandomizeKey randomly sets the key
+func (e *RandomEncrypter) RandomizeKey() {
+	e.Key = GetRandomBytes(16)
+}
+
 func (e RandomEncrypter) Encrypt(input []byte) []byte {
-	frontBytes := GetRandomBytesBetween(5, 10)
-	input = append(frontBytes, input...)
-
-	endBytes := GetRandomBytesBetween(5, 10)
-	input = append(input, endBytes...)
-
-	key := GetRandomBytes(16)
-	aesCipher, err := aes.NewBlockCipher(key)
+	aesCipher, err := aes.NewBlockCipher(e.Key)
 	if err != nil {
-		log.Println("Couldn't get block cipher to work", err)
+		log.Fatal("Couldn't get block cipher to work", err)
 	}
 
 	var encrypter cipher.BlockMode
@@ -82,6 +79,19 @@ func (e RandomEncrypter) Encrypt(input []byte) []byte {
 	output := make([]byte, len(paddedInput))
 	encrypter.CryptBlocks(output, []byte(paddedInput))
 	return output
+}
+
+// RandomEncrypter randomly pads information given and encodes in either
+// ECB or CBC mode.
+func (e RandomEncrypter) EncryptwithRandomKey(input []byte) []byte {
+	frontBytes := GetRandomBytesBetween(5, 10)
+	input = append(frontBytes, input...)
+
+	endBytes := GetRandomBytesBetween(5, 10)
+	input = append(input, endBytes...)
+	e.RandomizeKey()
+
+	return e.Encrypt(input)
 }
 
 // GetRandomBytes returns a number of random bytes between min and max

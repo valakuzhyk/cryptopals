@@ -27,3 +27,6 @@ Again, this was quite trivial, since we have already talked about how to identif
 ## Set 2
 ### Challenge 12: Byte-at-a-time ECB decrypt
 This is the start of what I think is really cool. How multiple pieces of the puzzle come together to completely bypass all of the work that went into making a code secure. To think that all of the math that has gone into AES (from my perspective is an impressive amount), is broken by comparing results for each letter. You are only as strong as your weakest link. Looking forward to implementing this, which again, should be quite straightforward. I'm a little sad they gave away the technique, but I guess that's not really the point of these challenges (at least, not as far as I have seen)
+
+## Set 2
+### Challenge 13: ECB cut-and-paste

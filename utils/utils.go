@@ -29,3 +29,8 @@ func PrintBytes(b1 []byte) {
 	}
 	fmt.Println()
 }
+
+// GetNthBlock returns the nth block after splitting up input in blocks of size blockSize
+func GetNthBlock(input []byte, n, blockSize int) []byte {
+	return input[n*blockSize : (n+1)*blockSize]
+}
