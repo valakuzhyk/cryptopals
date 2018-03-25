@@ -18,7 +18,7 @@ func TestSet2Challenge11(t *testing.T) {
 	randomEncrypter := vcipher.RandomEncrypter{}
 	wantMode := randomEncrypter.SetEncryptionMode(vcipher.RANDOM)
 	getMode := vcipher.ECBvsCBCOracle(randomEncrypter.Encrypt)
-	if wantMode == getMode {
+	if wantMode != getMode {
 		t.Fatalf("Wanted %d, got %d", wantMode, getMode)
 	}
 }
