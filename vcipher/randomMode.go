@@ -15,7 +15,8 @@ import (
 type EncryptionMode int
 
 const (
-	ECB_MODE EncryptionMode = iota
+	RANDOM EncryptionMode = iota
+	ECB_MODE
 	CBC_MODE
 )
 
@@ -38,8 +39,17 @@ type RandomEncrypter struct {
 }
 
 // SetEncryptionMode sets what kind of encryption the Encrypt function does.
-func (e RandomEncrypter) SetEncryptionMode(newMode EncryptionMode) {
+func (e *RandomEncrypter) SetEncryptionMode(newMode EncryptionMode) EncryptionMode {
+	if newMode == RANDOM {
+		randByte := GetRandomBytes(1)
+		if randByte[0] > 127 {
+			newMode = ECB_MODE
+		} else {
+			newMode = CBC_MODE
+		}
+	}
 	e.Mode = newMode
+	return e.Mode
 }
 
 // RandomEncrypter randomly pads information given and encodes in either
@@ -65,9 +75,11 @@ func (e RandomEncrypter) Encrypt(input []byte) []byte {
 		if err != nil {
 			log.Fatal("CBC encrypter failed ", err)
 		}
+	} else {
+		log.Fatal("invalid mode ", e.Mode)
 	}
 	paddedInput := utils.AddPKCS7Padding(string(input), encrypter.BlockSize())
-	output := make([]byte, len(input))
+	output := make([]byte, len(paddedInput))
 	encrypter.CryptBlocks(output, []byte(paddedInput))
 	return output
 }
