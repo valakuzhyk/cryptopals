@@ -19,3 +19,11 @@ It makes it seem like you can't have an odd multiple of the blocksize after padd
 ## Set 2
 ### Challenge 10: Implement CBC Mode
 After having already implemented ECB mode, this was quite trivial. The wikipedia page's image on how information flows made this a little more straightforward, as the wording for this challenge was not very clear at all.
+
+## Set 2
+### Challenge 11: Create a ECB/CBC oracle
+Again, this was quite trivial, since we have already talked about how to identify ECB. Especially when you have control over part of the plaintext, you can easily just send a repeating message, which would cause ECB to repeat as well (identical input blocks result in identical output blocks).
+
+## Set 2
+### Challenge 12: Byte-at-a-time ECB decrypt
+This is the start of what I think is really cool. How multiple pieces of the puzzle come together to completely bypass all of the work that went into making a code secure. To think that all of the math that has gone into AES (from my perspective is an impressive amount), is broken by comparing results for each letter. You are only as strong as your weakest link. Looking forward to implementing this, which again, should be quite straightforward. I'm a little sad they gave away the technique, but I guess that's not really the point of these challenges (at least, not as far as I have seen)
