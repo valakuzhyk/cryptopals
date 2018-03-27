@@ -15,9 +15,11 @@ import (
 type EncryptionMode int
 
 const (
-	RANDOM EncryptionMode = iota
-	ECB_MODE
-	CBC_MODE
+	RANDOM_ENCODE EncryptionMode = iota
+	ECB_ENCODE
+	ECB_DECODE
+	CBC_ENCODE
+	CBC_DECODE
 )
 
 // ECBvsCBCOracle identifies whether or not the function passed in
@@ -29,9 +31,9 @@ func ECBvsCBCOracle(encrypterFunction func(input []byte) []byte) EncryptionMode 
 	encryptedBytes := encrypterFunction(bytesToInput)
 	repeats := CountRepeats(string(encryptedBytes), 16)
 	if repeats > 0 {
-		return ECB_MODE
+		return ECB_ENCODE
 	}
-	return CBC_MODE
+	return CBC_ENCODE
 }
 
 type RandomEncrypter struct {
@@ -41,12 +43,12 @@ type RandomEncrypter struct {
 
 // SetEncryptionMode sets what kind of encryption the Encrypt function does.
 func (e *RandomEncrypter) SetEncryptionMode(newMode EncryptionMode) EncryptionMode {
-	if newMode == RANDOM {
+	if newMode == RANDOM_ENCODE {
 		randByte := GetRandomBytes(1)
 		if randByte[0] > 127 {
-			newMode = ECB_MODE
+			newMode = ECB_ENCODE
 		} else {
-			newMode = CBC_MODE
+			newMode = CBC_ENCODE
 		}
 	}
 	e.Mode = newMode
@@ -65,16 +67,24 @@ func (e RandomEncrypter) Encrypt(input []byte) []byte {
 	}
 
 	var encrypter cipher.BlockMode
-	if e.Mode == ECB_MODE {
+	if e.Mode == ECB_ENCODE {
 		encrypter = NewECBEncrypter(aesCipher)
-	} else if e.Mode == CBC_MODE {
+	} else if e.Mode == ECB_DECODE {
+		encrypter = NewECBDecrypter(aesCipher)
+	} else if e.Mode == CBC_ENCODE {
 		encrypter, err = NewCBCEncrypter(aesCipher, GetRandomBytes(16))
 		if err != nil {
 			log.Fatal("CBC encrypter failed ", err)
 		}
+	} else if e.Mode == CBC_DECODE {
+		encrypter, err = NewCBCDecrypter(aesCipher, GetRandomBytes(16))
+		if err != nil {
+			log.Fatal("CBC Decrypter failed ", err)
+		}
 	} else {
 		log.Fatal("invalid mode ", e.Mode)
 	}
+
 	paddedInput := utils.AddPKCS7Padding(string(input), encrypter.BlockSize())
 	output := make([]byte, len(paddedInput))
 	encrypter.CryptBlocks(output, []byte(paddedInput))

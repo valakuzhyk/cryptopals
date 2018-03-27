@@ -38,7 +38,7 @@ func IdentifyHiddenAppendedBytes(e AppendEncrypter) []byte {
 	blockSize := CalculateBlockSize(e.Encrypt)
 	// 2 Find encryption mode
 	mode := ECBvsCBCOracle(e.Encrypt)
-	if mode != ECB_MODE {
+	if mode != ECB_ENCODE {
 		log.Fatal("identifying appended strings only supported in ECB")
 	}
 

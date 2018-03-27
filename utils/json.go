@@ -13,7 +13,7 @@ func ParseKeyValuePairs(kvPairs string) (map[string]string, error) {
 	for _, p := range pairs {
 		keyValue := strings.Split(p, "=")
 		if len(keyValue) != 2 {
-			return nil, fmt.Errorf("Invalid format for pair", p)
+			return nil, fmt.Errorf("Invalid format for pair %s", p)
 		}
 		kvMapping[keyValue[0]] = keyValue[1]
 
@@ -21,6 +21,10 @@ func ParseKeyValuePairs(kvPairs string) (map[string]string, error) {
 	return kvMapping, nil
 }
 
-func ProfileFor(email string) {
-
+// ProfileFor generates a profile according to how we would want it for
+// challenge 13.
+func ProfileFor(email string) string {
+	email = strings.Replace(email, "&", "", -1)
+	email = strings.Replace(email, "=", "", -1)
+	return fmt.Sprintf("email=%s&uid=10&role=user", email)
 }

@@ -17,7 +17,7 @@ func TestCalculateBlockSize(t *testing.T) {
 		{"Basic",
 			args{RandomEncrypter{
 				Key:  []byte(strings.Repeat("A", 16)),
-				Mode: ECB_MODE,
+				Mode: ECB_ENCODE,
 			}.Encrypt}, 16,
 		},
 	}

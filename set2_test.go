@@ -13,6 +13,16 @@ import (
 	"github.com/valakuzhyk/cryptopals/vcipher"
 )
 
+func TestSet2Challenge13(t *testing.T) {
+	accountEncoder := vcipher.NewAccountEncoder()
+	output := accountEncoder.Encrypt("myemail@gmail.com")
+	decodedOutput := accountEncoder.Decrypt(output)
+	if decodedOutput["role"] != "admin" {
+		log.Println(decodedOutput)
+		t.Fatal("Unable to convert account to admin")
+	}
+}
+
 func TestSet2Challenge12(t *testing.T) {
 	unknownString := "Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkgaGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBqdXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUgYnkK"
 	unknownBytes, err := utils.Base64ToBytes(unknownString)
@@ -22,7 +32,7 @@ func TestSet2Challenge12(t *testing.T) {
 	e := vcipher.AppendEncrypter{}
 	e.SetEndBytes(unknownBytes)
 	e.RandomizeKey()
-	e.SetEncryptionMode(vcipher.ECB_MODE)
+	e.SetEncryptionMode(vcipher.ECB_ENCODE)
 	bytes := vcipher.IdentifyHiddenAppendedBytes(e)
 	if string(bytes) != string(unknownBytes) {
 		t.Fatal("unable to find the appended bytes by iterative decoding")
@@ -32,7 +42,7 @@ func TestSet2Challenge12(t *testing.T) {
 func TestSet2Challenge11(t *testing.T) {
 	// Implement ECB/CBC oracle
 	randomEncrypter := vcipher.RandomEncrypter{}
-	wantMode := randomEncrypter.SetEncryptionMode(vcipher.RANDOM)
+	wantMode := randomEncrypter.SetEncryptionMode(vcipher.RANDOM_ENCODE)
 	getMode := vcipher.ECBvsCBCOracle(randomEncrypter.EncryptwithRandomKey)
 	if wantMode != getMode {
 		t.Fatalf("Wanted %d, got %d", wantMode, getMode)
