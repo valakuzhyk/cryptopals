@@ -84,10 +84,16 @@ func (e RandomEncrypter) Encrypt(input []byte) []byte {
 	} else {
 		log.Fatal("invalid mode ", e.Mode)
 	}
+	if e.Mode == ECB_ENCODE || e.Mode == CBC_ENCODE {
+		input = []byte(utils.AddPKCS7Padding(string(input), encrypter.BlockSize()))
+	}
+	output := make([]byte, len(input))
+	encrypter.CryptBlocks(output, input)
 
-	paddedInput := utils.AddPKCS7Padding(string(input), encrypter.BlockSize())
-	output := make([]byte, len(paddedInput))
-	encrypter.CryptBlocks(output, []byte(paddedInput))
+	if e.Mode == ECB_DECODE || e.Mode == CBC_DECODE {
+		_, outputString := utils.RemovePKCS7Padding(string(output), encrypter.BlockSize())
+		output = []byte(outputString)
+	}
 	return output
 }
 
