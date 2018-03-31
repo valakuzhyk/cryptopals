@@ -29,4 +29,10 @@ Again, this was quite trivial, since we have already talked about how to identif
 This is the start of what I think is really cool. How multiple pieces of the puzzle come together to completely bypass all of the work that went into making a code secure. To think that all of the math that has gone into AES (from my perspective is an impressive amount), is broken by comparing results for each letter. You are only as strong as your weakest link. Looking forward to implementing this, which again, should be quite straightforward. I'm a little sad they gave away the technique, but I guess that's not really the point of these challenges (at least, not as far as I have seen)
 
 ## Set 2
-### Challenge 13: ECB cut-and-paste
+### Challenge 13: ECB cut-and-pastes
+At first I was worried that this would be complicated, but then its pretty easy to structure the blocks in a way that you can do this cut-and-paste attack. This is one of the punchlines for ECB based algorithms, which can't protect this "partial reuse" of other ciphertexts, among other things.
+
+I am a bit unsatisified with the lack of generality that is present in this solution though. I'm hoping in subsequent solutions, other requirements will lead me to allow for a more generic implementation of the cut and past attack.
+
+## Set 2
+### Challenge 14: Byte-at-a-time ECB Decrypt redux

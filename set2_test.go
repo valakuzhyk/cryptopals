@@ -15,8 +15,8 @@ import (
 
 func TestSet2Challenge13(t *testing.T) {
 	accountEncoder := vcipher.NewAccountEncoder()
-	output := accountEncoder.Encrypt("myemail@gmail.com")
-	decodedOutput := accountEncoder.Decrypt(output)
+	desiredBytes := vcipher.ECBCutAndPaste(accountEncoder)
+	decodedOutput := accountEncoder.Decrypt(desiredBytes)
 	if decodedOutput["role"] != "admin" {
 		log.Println(decodedOutput)
 		t.Fatal("Unable to convert account to admin")
