@@ -76,3 +76,26 @@ func TestShiftBytesRight(t *testing.T) {
 		})
 	}
 }
+
+func TestFirstBlockDiff(t *testing.T) {
+	type args struct {
+		input1    []byte
+		input2    []byte
+		blockSize int
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{"Second Block", args{[]byte{0x00, 0x01, 0x02, 0x02}, []byte{0x00, 0x01, 0x02, 0x3}, 2}, 1},
+		{"First Block", args{[]byte{0x00, 0x00, 0x02, 0x02}, []byte{0x00, 0x01, 0x02, 0x3}, 2}, 0},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := FirstBlockDiff(tt.args.input1, tt.args.input2, tt.args.blockSize); got != tt.want {
+				t.Errorf("FirstBlockDiff() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

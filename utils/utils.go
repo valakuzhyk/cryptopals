@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"math/bits"
+	"reflect"
 )
 
 func HammingDistance(b1, b2 []byte) int {
@@ -33,4 +34,17 @@ func PrintBytes(b1 []byte) {
 // GetNthBlock returns the nth block after splitting up input in blocks of size blockSize
 func GetNthBlock(input []byte, n, blockSize int) []byte {
 	return input[n*blockSize : (n+1)*blockSize]
+}
+
+// FirstBlockDiff returns the first block that is different between the inputs.
+// if they are the same, return -1
+func FirstBlockDiff(input1, input2 []byte, blockSize int) int {
+	for i := 0; i < len(input1)/blockSize; i++ {
+		block1 := GetNthBlock(input1, i, blockSize)
+		block2 := GetNthBlock(input2, i, blockSize)
+		if !reflect.DeepEqual(block1, block2) {
+			return i
+		}
+	}
+	return -1
 }

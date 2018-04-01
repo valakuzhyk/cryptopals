@@ -36,3 +36,19 @@ I am a bit unsatisified with the lack of generality that is present in this solu
 
 ## Set 2
 ### Challenge 14: Byte-at-a-time ECB Decrypt redux
+The first time I read this, since I knew it would be harder, I thought the problem implied that the random prefix was randomized each call. Rereading this, I see that you generate the random bytes, and prepend *that* string to every call. This is almost the same difficulty as the last one.
+
+For the harder case, I think its still doable though, it's just nondeterministic. First you can (likely) identify the block size using the same technique (checking fluctuations in the output). Knowing that its ECB using the same technique, you can then keep a dictionary keyed by the hash ending (which encodes how close to the end of the block you are) and the letter inserted. We know there should be the same number of endings as the blockSize + 1 (changed by the padding), so we can start filling out the map: 
+
+EndingBlock |  18c0adsf... | 9dsf3ji ... | ... 
+letter 'a'  |  12y32918... | 1934793 ... | ...
+letter 'b'  |  ...
+letter 'c'  |
+
+In here, we compare the penultimate block with one of the block_size+1 that we gather from not putting the letter there at all. 
+
+To speed this process up, for long decryptions, you can start understanding the connection between the suffixes, (knowing which suffixes are one character before another one).
+
+This technique is not guaranteed to work of course, there are cases when you could incorrectly identify the string, and you are never guaranteed to get this map of results (you could predict how long it would take, and optimize which lengths to letters to guess), but practically, I think it would be doable! Anyways back to the real problem...
+
+The real trick was just to add a tirck to find the block end right before the start of the suffix. By using the fact that I can tell when I have two complete blocks under my control, I can then identify exactly how much input I used to get to that point, letting me know the size (mod blocksize) of the prefix. After accommodating for this, the problem is the same as before.

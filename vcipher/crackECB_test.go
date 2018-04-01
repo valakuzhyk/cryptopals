@@ -29,3 +29,24 @@ func TestCalculateBlockSize(t *testing.T) {
 		})
 	}
 }
+
+func TestFindPrefixSize(t *testing.T) {
+	e := AppendEncrypter{}
+	e.SetBeginBytes([]byte("1234"))
+	e.SetEndBytes([]byte("sixsix"))
+	e.RandomizeKey()
+	e.SetEncryptionMode(ECB_ENCODE)
+	prefixSize := FindPrefixSize(e, 16)
+	if prefixSize != 4 {
+		t.Fatal("unable to find the appended bytes by iterative decoding")
+	}
+
+	e.SetBeginBytes([]byte("1234567"))
+	e.SetEndBytes([]byte("sixsix"))
+	e.RandomizeKey()
+	e.SetEncryptionMode(ECB_ENCODE)
+	prefixSize = FindPrefixSize(e, 16)
+	if prefixSize != 7 {
+		t.Fatal("unable to find the appended bytes by iterative decoding")
+	}
+}

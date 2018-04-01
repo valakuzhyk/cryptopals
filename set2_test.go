@@ -13,6 +13,26 @@ import (
 	"github.com/valakuzhyk/cryptopals/vcipher"
 )
 
+func TestSet2Challenge14(t *testing.T) {
+	unknownString := "Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkgaGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBqdXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUgYnkK"
+	unknownBytes, err := utils.Base64ToBytes(unknownString)
+	if err != nil {
+		log.Fatal("Couldn't decode base64: ", err)
+	}
+	e := vcipher.AppendEncrypter{}
+	startBytes := vcipher.GetRandomBytesBetween(0, 32)
+	e.SetBeginBytes(startBytes)
+	log.Printf("Start byte Length: %d", len(startBytes))
+
+	e.SetEndBytes(unknownBytes)
+	e.RandomizeKey()
+	e.SetEncryptionMode(vcipher.ECB_ENCODE)
+	bytes := vcipher.IdentifyHiddenAppendedBytes(e)
+	if string(bytes) != string(unknownBytes) {
+		t.Fatal("unable to find the appended bytes by iterative decoding")
+	}
+}
+
 func TestSet2Challenge13(t *testing.T) {
 	accountEncoder := vcipher.NewAccountEncoder()
 	desiredBytes := vcipher.ECBCutAndPaste(accountEncoder)
