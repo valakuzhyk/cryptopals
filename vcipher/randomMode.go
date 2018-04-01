@@ -1,9 +1,9 @@
 package vcipher
 
 import (
+	"bytes"
 	"crypto/cipher"
 	"log"
-	"strings"
 
 	"github.com/valakuzhyk/cryptopals/utils"
 
@@ -25,7 +25,7 @@ const (
 func ECBvsCBCOracle(encrypterFunction func(input []byte) []byte) EncryptionMode {
 	// If we send a bunch of the same character, if this is encrypting in ECB,
 	// the middle blocks would be the same.
-	bytesToInput := []byte(strings.Repeat("A", 100))
+	bytesToInput := bytes.Repeat([]byte("A"), 100)
 	encryptedBytes := encrypterFunction(bytesToInput)
 	repeats := CountRepeats(string(encryptedBytes), 16)
 	if repeats > 0 {

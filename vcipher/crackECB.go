@@ -1,6 +1,7 @@
 package vcipher
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	"math"
@@ -39,8 +40,6 @@ func (e AppendEncrypter) Encrypt(input []byte) []byte {
 // IdentifyHiddenAppendedBytes takes an encrypter a message containing
 // a user controlled message followed by an unknown message,
 func IdentifyHiddenAppendedBytes(e AppendEncrypter) []byte {
-	maxMessageLen := len(e.Encrypt([]byte{}))
-
 	// 1 Find Block Size
 	blockSize := CalculateBlockSize(e.Encrypt)
 	// 2 Find encryption mode
@@ -56,13 +55,15 @@ func IdentifyHiddenAppendedBytes(e AppendEncrypter) []byte {
 	// We now know that 'message' contains a string that ends at a block end.
 	// All we need is the offset. We need to ensure that the string is larger than the message.
 	desiredOffset := blockSize - prefixSize - 1
-	crackingStr := []byte(strings.Repeat("A", maxMessageLen+desiredOffset))
+	crackingStr := bytes.Repeat([]byte("A"), desiredOffset)
 	blockIdx := len(crackingStr) / blockSize
 
 	appendedMessage := []byte{}
 	for {
 		// 4 Find the value that you can append to the input such that this block's value doesn't change.
 		nextByte, err := findNextByte(e, crackingStr, appendedMessage, blockIdx, blockSize)
+		log.Println("Next byte")
+		log.Println(nextByte)
 		if err != nil {
 			if len(appendedMessage) == 0 {
 				log.Fatal("Unable to get any matching character")
@@ -75,12 +76,14 @@ func IdentifyHiddenAppendedBytes(e AppendEncrypter) []byte {
 
 		// 5 Repeat to find the next byte.
 		appendedMessage = append(appendedMessage, nextByte)
-		fmt.Println(len(crackingStr))
-		if len(crackingStr) == 0 {
-			break
+		if string(crackingStr) == "" {
+			crackingStr = []byte(strings.Repeat("A", blockSize-1))
+			blockIdx++
+		} else {
+			crackingStr = crackingStr[1:]
 		}
-		crackingStr = crackingStr[1:]
 	}
+	log.Println("Finish")
 	return appendedMessage
 }
 
@@ -114,11 +117,11 @@ func FindPrefixSize(e AppendEncrypter, blockSize int) int {
 		if string(firstBlockAfter) == string(secondBlockAfter) {
 			// Repeat this with a different character to validate that this is
 			// really the block we are in control of that are causing these blocks to be the same.
-			output := e.Encrypt([]byte(strings.Repeat("B", len(message))))
+			output := e.Encrypt(bytes.Repeat([]byte("B"), len(message)))
 			firstBlockAfter := utils.GetNthBlock(output, firstControlledBlock+1, blockSize)
 			secondBlockAfter := utils.GetNthBlock(output, firstControlledBlock+2, blockSize)
 			if string(firstBlockAfter) == string(secondBlockAfter) {
-				return blockSize - (len(message) % blockSize)
+				return (blockSize - (len(message) % blockSize)) % blockSize
 			}
 		}
 		message += "A"
@@ -140,7 +143,6 @@ func findNextByte(e AppendEncrypter, crackingStr, messageSoFar []byte, blockIdx,
 		encryptionOutputBlock := utils.GetNthBlock(encryptionOutput, blockIdx, blockSize)
 
 		if string(desiredOutputBlock) == string(encryptionOutputBlock) {
-			log.Println("Found Byte: " + string(b))
 			return b, nil
 		}
 	}

@@ -1,7 +1,7 @@
 package vcipher
 
 import (
-	"strings"
+	"bytes"
 	"testing"
 )
 
@@ -16,7 +16,7 @@ func TestCalculateBlockSize(t *testing.T) {
 	}{
 		{"Basic",
 			args{RandomEncrypter{
-				Key:  []byte(strings.Repeat("A", 16)),
+				Key:  bytes.Repeat([]byte("A"), 16),
 				Mode: ECB_ENCODE,
 			}.Encrypt}, 16,
 		},

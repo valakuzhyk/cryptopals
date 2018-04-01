@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"io/ioutil"
 	"log"
 	"path/filepath"
@@ -13,14 +14,11 @@ import (
 	"github.com/valakuzhyk/cryptopals/vcipher"
 )
 
-// This test is flaky, I wrote the solution to this without handling the case where
-// you happen to decrypt and get a special character ("=;"). So far, the only way I have thought
-// to handle this is to try a new string.
 func TestSet2Challenge16(t *testing.T) {
 	// CBC Bitflipping
 	e := vcipher.AppendEncrypter{}
-	e.RandomizeKey()
-	e.RandomizeIV()
+	e.Key = []byte("ASDFGHJKLQWERTYU")
+	e.IV = []byte("1234567890123456")
 	e.SetBeginBytes([]byte("comment1=cooking%20MCs;userdata="))
 	e.SetEndBytes([]byte(";comment2=%20like%20a%20pound%20of%20bacon"))
 	e.SetEncryptionMode(vcipher.CBC_ENCODE)
@@ -70,19 +68,19 @@ func TestSet2Challenge15(t *testing.T) {
 	wantHasPadding := true
 	wantDepadded := "ICE ICE BABY"
 	if hasPadding != wantHasPadding || depadded != wantDepadded {
-		log.Fatal("Unable to depad input correctly")
+		t.Fatal("Unable to depad input correctly")
 	}
 
 	hasPadding, _ = utils.RemovePKCS7Padding("ICE ICE BABY\x05\x05\x05\x05", 16)
 	wantHasPadding = false
 	if hasPadding != wantHasPadding {
-		log.Fatal("Thought there was padding, but there isn't")
+		t.Fatal("Thought there was padding, but there isn't")
 	}
 
 	hasPadding, _ = utils.RemovePKCS7Padding("ICE ICE BABY\x01\x02\x03\x04", 16)
 	wantHasPadding = false
 	if hasPadding != wantHasPadding {
-		log.Fatal("andddd still no padding")
+		t.Fatal("andddd still no padding")
 	}
 
 }
@@ -91,7 +89,7 @@ func TestSet2Challenge14(t *testing.T) {
 	unknownString := "Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkgaGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBqdXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUgYnkK"
 	unknownBytes, err := utils.Base64ToBytes(unknownString)
 	if err != nil {
-		log.Fatal("Couldn't decode base64: ", err)
+		t.Fatal("Couldn't decode base64: ", err)
 	}
 	e := vcipher.AppendEncrypter{}
 	startBytes := utils.GetRandomBytesBetween(0, 32)
@@ -121,7 +119,7 @@ func TestSet2Challenge12(t *testing.T) {
 	unknownString := "Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkgaGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBqdXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUgYnkK"
 	unknownBytes, err := utils.Base64ToBytes(unknownString)
 	if err != nil {
-		log.Fatal("Couldn't decode base64: ", err)
+		t.Fatal("Couldn't decode base64: ", err)
 	}
 	e := vcipher.AppendEncrypter{}
 	e.SetEndBytes(unknownBytes)
@@ -129,7 +127,9 @@ func TestSet2Challenge12(t *testing.T) {
 	e.SetEncryptionMode(vcipher.ECB_ENCODE)
 	bytes := vcipher.IdentifyHiddenAppendedBytes(e)
 	if string(bytes) != string(unknownBytes) {
+		log.Printf("String is %s", string(bytes))
 		t.Fatal("unable to find the appended bytes by iterative decoding")
+
 	}
 }
 
@@ -162,8 +162,8 @@ func TestSet2Challenge10(t *testing.T) {
 		t.Fatal("Unable to create aes block cipher")
 	}
 
-	iv := strings.Repeat("\x00", blockCipher.BlockSize())
-	ecbDecrypter, err := vcipher.NewCBCDecrypter(blockCipher, []byte(iv))
+	iv := bytes.Repeat([]byte{0x00}, blockCipher.BlockSize())
+	ecbDecrypter, err := vcipher.NewCBCDecrypter(blockCipher, iv)
 	if err != nil {
 		t.Fatal("unable to create CBC decrypter: ", err)
 	}
