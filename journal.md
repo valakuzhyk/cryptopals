@@ -56,6 +56,8 @@ So this one was pretty easy. As long as you control some data, you can essential
 
 I didn't write the solution to this one generically, since it seems like this was a somewhat specific case. But again, if I find this to be useful, it'll be refactored appropriately.
 
+## Some optimizations
+The AES implementation was taking over 10 seconds. I looked into removing some of the extra bytes in the string that were unneeded. Even then they were taking quite a bit of time. Eventually I looked into the AES implementation, and by choosing the appropriate order for parameters to one of my functions (the polynomial multiplication) there was a 50% improvement in the time of the the ECB cracking code.
 
 ## Set 3
 ### Challenge 17: CBC Padding Oracle

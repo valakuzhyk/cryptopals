@@ -2,6 +2,7 @@ package vcipher
 
 import (
 	"bytes"
+	"log"
 	"testing"
 )
 
@@ -37,8 +38,10 @@ func TestFindPrefixSize(t *testing.T) {
 	e.RandomizeKey()
 	e.SetEncryptionMode(ECB_ENCODE)
 	prefixSize := FindPrefixSize(e, 16)
-	if prefixSize != 4 {
-		t.Fatal("unable to find the appended bytes by iterative decoding")
+	want := 4
+	if prefixSize != want {
+		log.Printf("Thought %d, was %d", want, prefixSize)
+		t.Fatal("unable to find the prefix size")
 	}
 
 	e.SetBeginBytes([]byte("1234567"))
@@ -46,7 +49,10 @@ func TestFindPrefixSize(t *testing.T) {
 	e.RandomizeKey()
 	e.SetEncryptionMode(ECB_ENCODE)
 	prefixSize = FindPrefixSize(e, 16)
-	if prefixSize != 7 {
-		t.Fatal("unable to find the appended bytes by iterative decoding")
+	want2 := 7
+	if prefixSize != want2 {
+		log.Printf("Thought %d, was %d", want2, prefixSize)
+
+		t.Fatal("unable to find the prefix size, the second time")
 	}
 }

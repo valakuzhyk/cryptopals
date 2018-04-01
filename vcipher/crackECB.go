@@ -54,16 +54,15 @@ func IdentifyHiddenAppendedBytes(e AppendEncrypter) []byte {
 	// 3 Create input that is one byte less and get output
 	// We now know that 'message' contains a string that ends at a block end.
 	// All we need is the offset. We need to ensure that the string is larger than the message.
-	desiredOffset := blockSize - prefixSize - 1
+	desiredOffset := blockSize + ((-prefixSize - 1) % blockSize)
 	crackingStr := bytes.Repeat([]byte("A"), desiredOffset)
-	blockIdx := len(crackingStr) / blockSize
+	blockIdx := prefixSize / blockSize
 
 	appendedMessage := []byte{}
 	for {
 		// 4 Find the value that you can append to the input such that this block's value doesn't change.
 		nextByte, err := findNextByte(e, crackingStr, appendedMessage, blockIdx, blockSize)
-		log.Println("Next byte")
-		log.Println(nextByte)
+		log.Printf("Next Byte %s", string(nextByte))
 		if err != nil {
 			if len(appendedMessage) == 0 {
 				log.Fatal("Unable to get any matching character")
@@ -83,7 +82,6 @@ func IdentifyHiddenAppendedBytes(e AppendEncrypter) []byte {
 			crackingStr = crackingStr[1:]
 		}
 	}
-	log.Println("Finish")
 	return appendedMessage
 }
 
@@ -121,7 +119,9 @@ func FindPrefixSize(e AppendEncrypter, blockSize int) int {
 			firstBlockAfter := utils.GetNthBlock(output, firstControlledBlock+1, blockSize)
 			secondBlockAfter := utils.GetNthBlock(output, firstControlledBlock+2, blockSize)
 			if string(firstBlockAfter) == string(secondBlockAfter) {
-				return (blockSize - (len(message) % blockSize)) % blockSize
+				// Now the len(prefix) + len(message) = blockSize*(firstControlledBlock+3)
+				// Return the prefix length
+				return blockSize*(firstControlledBlock+3) - len(message)
 			}
 		}
 		message += "A"

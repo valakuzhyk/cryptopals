@@ -75,11 +75,10 @@ func (b blockCipher) extractOutput(dst []byte) {
 // If represent in binary in the way AES is implemented, this is the same
 // as multiplying by 2.
 func xtime(word byte) byte {
-	shifted := int16(word) << 1
-	if shifted&0x0100 == 0 {
-		return byte(shifted)
+	if word&0x80 == 0 { // If the top bit is 1
+		return word << 1
 	}
-	return byte(shifted ^ 0x1b)
+	return (word << 1) ^ 0x1b
 }
 
 func xpow(pow int) byte {
@@ -93,13 +92,13 @@ func xpow(pow int) byte {
 func multiply(worda, wordb byte) byte {
 	// assume that wordb is the smaller one
 	output := byte(0)
-	powX := wordb
-	for worda != 0 {
-		if worda&1 == 1 {
+	powX := worda
+	for wordb != 0 {
+		if wordb&1 == 1 {
 			output ^= powX
 		}
 		powX = xtime(powX)
-		worda = worda >> 1
+		wordb = wordb >> 1
 	}
 
 	return output

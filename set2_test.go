@@ -92,17 +92,22 @@ func TestSet2Challenge14(t *testing.T) {
 		t.Fatal("Couldn't decode base64: ", err)
 	}
 	e := vcipher.AppendEncrypter{}
-	startBytes := utils.GetRandomBytesBetween(0, 32)
+	startBytes := utils.GetRandomBytesBetween(0, 29)
 	e.SetBeginBytes(startBytes)
-	log.Printf("Start byte Length: %d", len(startBytes))
+	e.SetBeginBytes([]byte("12345678901234567"))
+
+	log.Printf("Start byte Length: %d", len(startBytes)%16)
 
 	e.SetEndBytes(unknownBytes)
 	e.RandomizeKey()
+	e.Key = []byte("ASDFGHJKLQWERTYU")
 	e.SetEncryptionMode(vcipher.ECB_ENCODE)
 	bytes := vcipher.IdentifyHiddenAppendedBytes(e)
+
 	if string(bytes) != string(unknownBytes) {
 		t.Fatal("unable to find the appended bytes by iterative decoding")
 	}
+	log.Println(string(unknownBytes))
 }
 
 func TestSet2Challenge13(t *testing.T) {

@@ -35,6 +35,12 @@ func Test_xtime(t *testing.T) {
 	}
 }
 
+func BenchmarkXtime(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		xtime(byte(i % 255))
+	}
+}
+
 func Test_multiply(t *testing.T) {
 	type args struct {
 		worda byte
@@ -62,5 +68,17 @@ func Test_multiply(t *testing.T) {
 				t.Errorf("multiply() = %X, want %X", got, tt.want)
 			}
 		})
+	}
+}
+
+func BenchmarkMultiply(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		multiply(byte(i%255), byte(1))
+	}
+}
+
+func BenchmarkInverseMultiply(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		multiply(byte(1), byte(i%255))
 	}
 }
