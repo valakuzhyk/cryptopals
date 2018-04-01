@@ -13,7 +13,59 @@ import (
 	"github.com/valakuzhyk/cryptopals/vcipher"
 )
 
+// This test is flaky, I wrote the solution to this without handling the case where
+// you happen to decrypt and get a special character ("=;"). So far, the only way I have thought
+// to handle this is to try a new string.
+func TestSet2Challenge16(t *testing.T) {
+	// CBC Bitflipping
+	e := vcipher.AppendEncrypter{}
+	e.RandomizeKey()
+	e.RandomizeIV()
+	e.SetBeginBytes([]byte("comment1=cooking%20MCs;userdata="))
+	e.SetEndBytes([]byte(";comment2=%20like%20a%20pound%20of%20bacon"))
+	e.SetEncryptionMode(vcipher.CBC_ENCODE)
+
+	blockSize := vcipher.CalculateBlockSize(e.Encrypt)
+
+	// This is our scratch space. We will scramble the first block that we write,
+	// by modifying it with our desired message. This will insert our message into the next block.
+	input := strings.Repeat("\x00", blockSize*2)
+
+	// This is the step that prevents you from just specifying you are admin.
+	input = strings.Replace(input, ";", "", -1)
+	input = strings.Replace(input, "=", "", -1)
+	encryptedInput := e.Encrypt([]byte(input))
+
+	block := utils.GetNthBlock(encryptedInput, 2, blockSize)
+	desiredString := "aaaaa;admin=true"
+	for i := range block {
+		block[i] ^= byte(desiredString[i])
+	}
+
+	e.SetEncryptionMode(vcipher.CBC_DECODE)
+	e.SetBeginBytes([]byte{})
+	e.SetEndBytes([]byte{})
+	unencryptedData := e.Encrypt(encryptedInput)
+	log.Println(string(unencryptedData))
+
+	propertyMap := map[string]string{}
+	tuples := strings.Split(string(unencryptedData), ";")
+	for _, tuple := range tuples {
+		log.Println(tuple)
+		keyValue := strings.Split(tuple, "=")
+		if len(keyValue) != 2 {
+			t.Fatalf("Invalid format %s", tuple)
+		}
+		propertyMap[keyValue[0]] = keyValue[1]
+	}
+	log.Println(propertyMap)
+	if propertyMap["admin"] != "true" {
+		t.Fatal("Unfortunate. You had so much potential.")
+	}
+}
+
 func TestSet2Challenge15(t *testing.T) {
+	// Validate PKCS #7 padding
 	hasPadding, depadded := utils.RemovePKCS7Padding("ICE ICE BABY\x04\x04\x04\x04", 16)
 	wantHasPadding := true
 	wantDepadded := "ICE ICE BABY"

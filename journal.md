@@ -59,3 +59,6 @@ Yeahhhh, so I already did this to do the previous challenges properly. Don't see
 
 ## Set 2
 ### Challenge 16: CBC Bitflipping
+So this one was pretty easy. As long as you control some data, you can essentially write whatever you want into the blocks, as long as you are willing to accept unknown data being written in right before it.
+
+I didn't write the solution to this one generically, since it seems like this was a somewhat specific case. But again, if I find this to be useful, it'll be refactored appropriately.

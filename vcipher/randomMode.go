@@ -39,16 +39,20 @@ func ECBvsCBCOracle(encrypterFunction func(input []byte) []byte) EncryptionMode 
 type RandomEncrypter struct {
 	Mode EncryptionMode
 	Key  []byte
+	IV   []byte
 }
 
 // SetEncryptionMode sets what kind of encryption the Encrypt function does.
 func (e *RandomEncrypter) SetEncryptionMode(newMode EncryptionMode) EncryptionMode {
 	if newMode == RANDOM_ENCODE {
 		randByte := GetRandomBytes(1)
+		e.RandomizeKey()
+
 		if randByte[0] > 127 {
 			newMode = ECB_ENCODE
 		} else {
 			newMode = CBC_ENCODE
+			e.RandomizeIV()
 		}
 	}
 	e.Mode = newMode
@@ -58,6 +62,12 @@ func (e *RandomEncrypter) SetEncryptionMode(newMode EncryptionMode) EncryptionMo
 // RandomizeKey randomly sets the key
 func (e *RandomEncrypter) RandomizeKey() {
 	e.Key = GetRandomBytes(16)
+
+}
+
+// RandomizeIV randomly sets the iv
+func (e *RandomEncrypter) RandomizeIV() {
+	e.IV = GetRandomBytes(16)
 }
 
 func (e RandomEncrypter) Encrypt(input []byte) []byte {
@@ -72,14 +82,14 @@ func (e RandomEncrypter) Encrypt(input []byte) []byte {
 	} else if e.Mode == ECB_DECODE {
 		encrypter = NewECBDecrypter(aesCipher)
 	} else if e.Mode == CBC_ENCODE {
-		encrypter, err = NewCBCEncrypter(aesCipher, GetRandomBytes(16))
+		encrypter, err = NewCBCEncrypter(aesCipher, e.IV)
 		if err != nil {
 			log.Fatal("CBC encrypter failed ", err)
 		}
 	} else if e.Mode == CBC_DECODE {
-		encrypter, err = NewCBCDecrypter(aesCipher, GetRandomBytes(16))
+		encrypter, err = NewCBCDecrypter(aesCipher, e.IV)
 		if err != nil {
-			log.Fatal("CBC Decrypter failed ", err)
+			log.Fatal("CBC Decrypter failed ", e.IV)
 		}
 	} else {
 		log.Fatal("invalid mode ", e.Mode)
