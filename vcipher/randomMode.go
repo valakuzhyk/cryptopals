@@ -2,9 +2,7 @@ package vcipher
 
 import (
 	"crypto/cipher"
-	"crypto/rand"
 	"log"
-	"math/big"
 	"strings"
 
 	"github.com/valakuzhyk/cryptopals/utils"
@@ -45,7 +43,7 @@ type RandomEncrypter struct {
 // SetEncryptionMode sets what kind of encryption the Encrypt function does.
 func (e *RandomEncrypter) SetEncryptionMode(newMode EncryptionMode) EncryptionMode {
 	if newMode == RANDOM_ENCODE {
-		randByte := GetRandomBytes(1)
+		randByte := utils.GetRandomBytes(1)
 		e.RandomizeKey()
 
 		if randByte[0] > 127 {
@@ -61,13 +59,13 @@ func (e *RandomEncrypter) SetEncryptionMode(newMode EncryptionMode) EncryptionMo
 
 // RandomizeKey randomly sets the key
 func (e *RandomEncrypter) RandomizeKey() {
-	e.Key = GetRandomBytes(16)
+	e.Key = utils.GetRandomBytes(16)
 
 }
 
 // RandomizeIV randomly sets the iv
 func (e *RandomEncrypter) RandomizeIV() {
-	e.IV = GetRandomBytes(16)
+	e.IV = utils.GetRandomBytes(16)
 }
 
 func (e RandomEncrypter) Encrypt(input []byte) []byte {
@@ -109,34 +107,10 @@ func (e RandomEncrypter) Encrypt(input []byte) []byte {
 
 // RandomEncrypter randomly pads information given and encodes in either
 // ECB or CBC mode.
-func (e RandomEncrypter) EncryptwithRandomKey(input []byte) []byte {
-	frontBytes := GetRandomBytesBetween(5, 10)
-	input = append(frontBytes, input...)
-
-	endBytes := GetRandomBytesBetween(5, 10)
-	input = append(input, endBytes...)
+func (e AppendEncrypter) EncryptwithRandomPaddingAndKey(input []byte) []byte {
+	e.SetBeginBytes(utils.GetRandomBytesBetween(5, 10))
+	e.SetEndBytes(utils.GetRandomBytesBetween(5, 10))
 	e.RandomizeKey()
 
-	return e.Encrypt(input)
-}
-
-// GetRandomBytes returns a number of random bytes between min and max
-func GetRandomBytesBetween(min, max int) []byte {
-	maxIntSize := big.NewInt(int64(max - min))
-	numByteOffset, err := rand.Int(rand.Reader, maxIntSize)
-	if err != nil {
-		log.Fatal("Issue computing random int: ", err)
-	}
-	numBytes := min + int(numByteOffset.Uint64())
-
-	return GetRandomBytes(numBytes)
-}
-
-func GetRandomBytes(numBytes int) []byte {
-	randBytes := make([]byte, numBytes)
-	_, err := rand.Read(randBytes)
-	if err != nil {
-		log.Fatal("Issue computing random bytes: ", err)
-	}
-	return randBytes
+	return e.RandomEncrypter.Encrypt(input)
 }

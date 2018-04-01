@@ -1,7 +1,10 @@
 package utils
 
 import (
+	"crypto/rand"
 	"fmt"
+	"log"
+	"math/big"
 	"math/bits"
 	"reflect"
 )
@@ -47,4 +50,25 @@ func FirstBlockDiff(input1, input2 []byte, blockSize int) int {
 		}
 	}
 	return -1
+}
+
+// GetRandomBytes returns a number of random bytes between min and max
+func GetRandomBytesBetween(min, max int) []byte {
+	maxIntSize := big.NewInt(int64(max - min))
+	numByteOffset, err := rand.Int(rand.Reader, maxIntSize)
+	if err != nil {
+		log.Fatal("Issue computing random int: ", err)
+	}
+	numBytes := min + int(numByteOffset.Uint64())
+
+	return GetRandomBytes(numBytes)
+}
+
+func GetRandomBytes(numBytes int) []byte {
+	randBytes := make([]byte, numBytes)
+	_, err := rand.Read(randBytes)
+	if err != nil {
+		log.Fatal("Issue computing random bytes: ", err)
+	}
+	return randBytes
 }

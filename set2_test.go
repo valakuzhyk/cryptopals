@@ -94,7 +94,7 @@ func TestSet2Challenge14(t *testing.T) {
 		log.Fatal("Couldn't decode base64: ", err)
 	}
 	e := vcipher.AppendEncrypter{}
-	startBytes := vcipher.GetRandomBytesBetween(0, 32)
+	startBytes := utils.GetRandomBytesBetween(0, 32)
 	e.SetBeginBytes(startBytes)
 	log.Printf("Start byte Length: %d", len(startBytes))
 
@@ -135,9 +135,9 @@ func TestSet2Challenge12(t *testing.T) {
 
 func TestSet2Challenge11(t *testing.T) {
 	// Implement ECB/CBC oracle
-	randomEncrypter := vcipher.RandomEncrypter{}
-	wantMode := randomEncrypter.SetEncryptionMode(vcipher.RANDOM_ENCODE)
-	getMode := vcipher.ECBvsCBCOracle(randomEncrypter.EncryptwithRandomKey)
+	e := vcipher.AppendEncrypter{}
+	wantMode := e.SetEncryptionMode(vcipher.RANDOM_ENCODE)
+	getMode := vcipher.ECBvsCBCOracle(e.EncryptwithRandomPaddingAndKey)
 	if wantMode != getMode {
 		t.Fatalf("Wanted %d, got %d", wantMode, getMode)
 	}
