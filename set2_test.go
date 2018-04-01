@@ -13,6 +13,28 @@ import (
 	"github.com/valakuzhyk/cryptopals/vcipher"
 )
 
+func TestSet2Challenge15(t *testing.T) {
+	hasPadding, depadded := utils.RemovePKCS7Padding("ICE ICE BABY\x04\x04\x04\x04", 16)
+	wantHasPadding := true
+	wantDepadded := "ICE ICE BABY"
+	if hasPadding != wantHasPadding || depadded != wantDepadded {
+		log.Fatal("Unable to depad input correctly")
+	}
+
+	hasPadding, _ = utils.RemovePKCS7Padding("ICE ICE BABY\x05\x05\x05\x05", 16)
+	wantHasPadding = false
+	if hasPadding != wantHasPadding {
+		log.Fatal("Thought there was padding, but there isn't")
+	}
+
+	hasPadding, _ = utils.RemovePKCS7Padding("ICE ICE BABY\x01\x02\x03\x04", 16)
+	wantHasPadding = false
+	if hasPadding != wantHasPadding {
+		log.Fatal("andddd still no padding")
+	}
+
+}
+
 func TestSet2Challenge14(t *testing.T) {
 	unknownString := "Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkgaGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBqdXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUgYnkK"
 	unknownBytes, err := utils.Base64ToBytes(unknownString)

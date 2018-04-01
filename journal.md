@@ -52,3 +52,10 @@ To speed this process up, for long decryptions, you can start understanding the 
 This technique is not guaranteed to work of course, there are cases when you could incorrectly identify the string, and you are never guaranteed to get this map of results (you could predict how long it would take, and optimize which lengths to letters to guess), but practically, I think it would be doable! Anyways back to the real problem...
 
 The real trick was just to add a tirck to find the block end right before the start of the suffix. By using the fact that I can tell when I have two complete blocks under my control, I can then identify exactly how much input I used to get to that point, letting me know the size (mod blocksize) of the prefix. After accommodating for this, the problem is the same as before.
+
+## Set 2
+### Challenge 15: PKCS #7 Padding Validation
+Yeahhhh, so I already did this to do the previous challenges properly. Don't see why you wouldn't have done this earlier. Though while implementing this, I can see a lot of potential for messing up edge cases.
+
+## Set 2
+### Challenge 16: CBC Bitflipping
