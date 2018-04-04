@@ -35,6 +35,6 @@ func (o Oracle) HasValidPadding(ciphertext []byte) bool {
 // DecodeCBCWithPaddingOracle returns the plaintext from ciphertext given that you have an oracle
 // that tells you whether the padding on a given message is valid.
 func DecodeCBCWithPaddingOracle(ciphertext []byte, oracle Oracle) []byte {
-	log.Fatal("Not implemented yet! But will be soon :)")
+	log.Println("Not implemented yet! But will be soon :)")
 	return []byte{}
 }
