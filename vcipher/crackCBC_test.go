@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestCBCPaddingOracle_HasPadding(t *testing.T) {
+func TestHasValidPadding_true(t *testing.T) {
 	e := RandomEncrypter{}
 	e.SetEncryptionMode(CBC_ENCODE)
 	e.IV = bytes.Repeat([]byte("A"), e.GetBlockSize())
@@ -13,15 +13,18 @@ func TestCBCPaddingOracle_HasPadding(t *testing.T) {
 
 	ciphertext := e.Encrypt([]byte("This is it. Please let me know."))
 
+	e.SetEncryptionMode(CBC_DECODE)
+	oracle := NewCBCOracle(e)
+
 	want := true
 
-	if got := CBCPaddingOracle(ciphertext, e.Key, e.IV); got != want {
-		t.Errorf("CBCPaddingOracle() = %v, want %v", got, want)
+	if got := oracle.HasValidPadding(ciphertext); got != want {
+		t.Errorf("HasValidPadding() = %v, want %v", got, want)
 	}
 
 }
 
-func TestCBCPaddingOracle_InvalidPadding(t *testing.T) {
+func TestHasValidPadding_false(t *testing.T) {
 	e := RandomEncrypter{}
 	e.SetEncryptionMode(CBC_ENCODE)
 	e.IV = bytes.Repeat([]byte("A"), e.GetBlockSize())
@@ -29,10 +32,13 @@ func TestCBCPaddingOracle_InvalidPadding(t *testing.T) {
 	e.SetIgnorePadding(true)
 	ciphertext := e.Encrypt([]byte("This is it. Please let me know.\x02"))
 
+	e.SetEncryptionMode(CBC_DECODE)
+	oracle := NewCBCOracle(e)
+
 	want := false
 
-	if got := CBCPaddingOracle(ciphertext, e.Key, e.IV); got != want {
-		t.Errorf("CBCPaddingOracle() = %v, want %v", got, want)
+	if got := oracle.HasValidPadding(ciphertext); got != want {
+		t.Errorf("HasValidPadding() = %v, want %v", got, want)
 	}
 
 }

@@ -34,6 +34,11 @@ func TestSet3Challenge17(t *testing.T) {
 	e.RandomizeKey()
 	e.SetEncryptionMode(vcipher.CBC_ENCODE)
 	encryptedString := e.Encrypt([]byte(stringToUse))
-	vcipher.CBCPaddingOracle(encryptedString, e.Key, e.IV)
+
+	// Now, time to create the CBC oracle
+	e.SetEncryptionMode(vcipher.CBC_DECODE)
+	oracle := vcipher.NewCBCOracle(e)
+
+	plaintext := vcipher.DecodeCBCWithPaddingOracle(ciphertext, oracle)
 
 }
