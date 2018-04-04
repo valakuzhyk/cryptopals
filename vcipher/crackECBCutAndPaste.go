@@ -42,7 +42,7 @@ func (e AccountEncoder) Decrypt(input []byte) map[string]string {
 // ECBCutAndPaste does a cut and paste attack that take a string and
 // append the desired string?
 func ECBCutAndPaste(encrypter AccountEncoder) []byte {
-	blockSize := 16
+	blockSize := encrypter.GetBlockSize()
 	// First, we need to get a block that can be used to set the admin field
 	firstBlock := strings.Repeat("A", blockSize-len("email="))
 	secondBlock := utils.AddPKCS7Padding("admin", blockSize)

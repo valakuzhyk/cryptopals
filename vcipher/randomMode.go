@@ -35,9 +35,10 @@ func ECBvsCBCOracle(encrypterFunction func(input []byte) []byte) EncryptionMode 
 }
 
 type RandomEncrypter struct {
-	Mode EncryptionMode
-	Key  []byte
-	IV   []byte
+	Mode          EncryptionMode
+	Key           []byte
+	IV            []byte
+	ignorePadding bool
 }
 
 // SetEncryptionMode sets what kind of encryption the Encrypt function does.
@@ -59,13 +60,20 @@ func (e *RandomEncrypter) SetEncryptionMode(newMode EncryptionMode) EncryptionMo
 
 // RandomizeKey randomly sets the key
 func (e *RandomEncrypter) RandomizeKey() {
-	e.Key = utils.GetRandomBytes(16)
-
+	e.Key = utils.GetRandomBytes(e.GetBlockSize())
 }
 
 // RandomizeIV randomly sets the iv
 func (e *RandomEncrypter) RandomizeIV() {
-	e.IV = utils.GetRandomBytes(16)
+	e.IV = utils.GetRandomBytes(e.GetBlockSize())
+}
+
+func (e *RandomEncrypter) GetBlockSize() int {
+	return 16
+}
+
+func (e *RandomEncrypter) SetIgnorePadding(setting bool) {
+	e.ignorePadding = setting
 }
 
 func (e RandomEncrypter) Encrypt(input []byte) []byte {
@@ -92,17 +100,25 @@ func (e RandomEncrypter) Encrypt(input []byte) []byte {
 	} else {
 		log.Fatal("invalid mode ", e.Mode)
 	}
-	if e.Mode == ECB_ENCODE || e.Mode == CBC_ENCODE {
+	if e.isEncoding() && !e.ignorePadding {
 		input = []byte(utils.AddPKCS7Padding(string(input), encrypter.BlockSize()))
 	}
 	output := make([]byte, len(input))
 	encrypter.CryptBlocks(output, input)
 
-	if e.Mode == ECB_DECODE || e.Mode == CBC_DECODE {
+	if e.isDecoding() && !e.ignorePadding {
 		_, outputString := utils.RemovePKCS7Padding(string(output), encrypter.BlockSize())
 		output = []byte(outputString)
 	}
 	return output
+}
+
+func (e RandomEncrypter) isEncoding() bool {
+	return e.Mode == CBC_ENCODE || e.Mode == ECB_ENCODE
+}
+
+func (e RandomEncrypter) isDecoding() bool {
+	return e.Mode == CBC_DECODE || e.Mode == ECB_DECODE
 }
 
 // RandomEncrypter randomly pads information given and encodes in either

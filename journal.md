@@ -61,3 +61,13 @@ The AES implementation was taking over 10 seconds. I looked into removing some o
 
 ## Set 3
 ### Challenge 17: CBC Padding Oracle
+As I was writing how this challenge had me unclear on what to do, the solution came to me. It's a slight modification of the previous challenge. Before, knowledge of the plaintext allowed me to modify the ciphertext to change how the message was decoded.
+This time, instead, I want to use this knowledge of the decrypted data to solve for the original data.
+
+This is the idea:
+
+Go through all byte modifications of the last byte in the block before the last block. Hopefully, only one of them should result in the padding being correct. The byte you chose XORed with the padding byte "\0x01" results in the original plaintext.
+
+ Now there is a chance that there are two values of this byte that make the padding correct (there can only be two). Now, one of them is definitely xoring to make the value 1, the other, some other value. However, if we mess around with the penultimate byte, only one of them will remain stable. After finding this first byte and controlling its value, the rest of the bytes we won't have to worry about this edge case however.
+
+Notice how padding is irrelevant to this strategy. In fact, you should be able to conclude what the final bytes are for blocks in the middle of the message :) just make it the last block by moving all the rest after it.
