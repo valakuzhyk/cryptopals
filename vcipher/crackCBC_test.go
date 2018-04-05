@@ -18,7 +18,7 @@ func TestHasValidPadding_true(t *testing.T) {
 
 	want := true
 
-	if got := oracle.HasValidPadding(ciphertext); got != want {
+	if got := oracle.HasValidPadding(e.IV, ciphertext); got != want {
 		t.Errorf("HasValidPadding() = %v, want %v", got, want)
 	}
 
@@ -37,7 +37,7 @@ func TestHasValidPadding_false(t *testing.T) {
 
 	want := false
 
-	if got := oracle.HasValidPadding(ciphertext); got != want {
+	if got := oracle.HasValidPadding(e.IV, ciphertext); got != want {
 		t.Errorf("HasValidPadding() = %v, want %v", got, want)
 	}
 

@@ -40,6 +40,7 @@ func TestRemovePKCS7Padding(t *testing.T) {
 		{"HasPadding", args{"YELLOW\x04\x04\x04\x04", 10}, true, "YELLOW"},
 		{"NoPadding", args{"YELLOW\x04\x04\x04", 10}, false, "YELLOW\x04\x04\x04"},
 		{"NotAtBlockSize", args{"YELLOW\x03\x03\x03", 10}, false, "YELLOW\x03\x03\x03"},
+		{"LastByteZero", args{"YELLOW\x03\x03\x00", 10}, false, "YELLOW\x03\x03\x00"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -1,10 +1,10 @@
 package main
 
 import (
-	"crypto/rand"
 	"log"
-	"math/big"
 	"testing"
+
+	"github.com/valakuzhyk/cryptopals/utils"
 
 	"github.com/valakuzhyk/cryptopals/vcipher"
 )
@@ -23,23 +23,27 @@ func TestSet3Challenge17(t *testing.T) {
 		"MDAwMDA5aXRoIG15IHJhZy10b3AgZG93biBzbyBteSBoYWlyIGNhbiBibG93",
 	}
 
-	numByteOffset, err := rand.Int(rand.Reader, big.NewInt(10))
-	if err != nil {
-		log.Fatal("Issue computing random int: ", err)
+	for _, stringToUse := range possibleStrings {
+
+		e := vcipher.RandomEncrypter{}
+		e.RandomizeIV()
+		e.RandomizeKey()
+		e.SetEncryptionMode(vcipher.CBC_ENCODE)
+		stringBytes, err := utils.Base64ToBytes(stringToUse)
+		if err != nil {
+			log.Fatal("Couldn't base64 decode string: ", err)
+		}
+		ciphertext := e.Encrypt(stringBytes)
+
+		// Now, time to create the CBC oracle
+		e.SetEncryptionMode(vcipher.CBC_DECODE)
+		oracle := vcipher.NewCBCOracle(e)
+
+		// Will recieve the plaintext here.
+		decryptedText := vcipher.DecodeCBCWithPaddingOracle(e.IV, ciphertext, oracle)
+		if string(decryptedText) != string(stringBytes) {
+			log.Fatalf("Couldn't decode, got %s, want %s", string(decryptedText), string(stringBytes))
+		}
 	}
-	stringToUse := possibleStrings[int(numByteOffset.Uint64())]
-
-	e := vcipher.RandomEncrypter{}
-	e.RandomizeIV()
-	e.RandomizeKey()
-	e.SetEncryptionMode(vcipher.CBC_ENCODE)
-	ciphertext := e.Encrypt([]byte(stringToUse))
-
-	// Now, time to create the CBC oracle
-	e.SetEncryptionMode(vcipher.CBC_DECODE)
-	oracle := vcipher.NewCBCOracle(e)
-
-	// Will recieve the plaintext here.
-	_ = vcipher.DecodeCBCWithPaddingOracle(ciphertext, oracle)
 
 }
