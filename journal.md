@@ -71,3 +71,9 @@ Go through all byte modifications of the last byte in the block before the last 
  Now there is a chance that there are two values of this byte that make the padding correct (there can only be two). Now, one of them is definitely xoring to make the value 1, the other, some other value. However, if we mess around with the penultimate byte, only one of them will remain stable. After finding this first byte and controlling its value, the rest of the bytes we won't have to worry about this edge case however.
 
 Notice how padding is irrelevant to this strategy. In fact, you should be able to conclude what the final bytes are for blocks in the middle of the message :) just make it the last block by moving all the rest after it.
+
+## Set 3
+### Challenge 18: Introducing CTR Mode
+I'm intrigued at this mode, its not something that I have read about before, but I like how it makes a block cipher into a stream cipher, while also (seemingly) nullifying the attacks from earlier. Also, it doesn't need both decrypt and encrypt, which is nice.
+
+That being said, the challenge was fairly straightforward.
