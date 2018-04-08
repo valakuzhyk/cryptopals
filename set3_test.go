@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/valakuzhyk/cryptopals/vcipher/vrandom"
 	"github.com/valakuzhyk/cryptopals/xor"
 
 	"github.com/valakuzhyk/cryptopals/aes"
@@ -16,6 +17,30 @@ import (
 
 	"github.com/valakuzhyk/cryptopals/vcipher"
 )
+
+func TestSet3Challenge21(t *testing.T) {
+	mt := vrandom.NewMersenneTwister(1)
+
+	// Recived from http://create.stephan-brumme.com/mersenne-twister/
+	wantFirst10 := []uint32{
+		0x6AC1F425,
+		0xFF4780EB,
+		0xB8672F8C,
+		0xEEBC1448,
+		0x00077EFF,
+		0x20CCC389,
+		0x4D65AACB,
+		0xFFC11E85,
+		0x2591CB4F,
+		0x3C7053C0,
+	}
+	for i, want := range wantFirst10 {
+		got := mt.Rand()
+		if want != got {
+			log.Fatal("%d iteration, want %x, got %x", i, want, got)
+		}
+	}
+}
 
 func TestSet3Challenge20(t *testing.T) {
 	absPath, _ := filepath.Abs("../cryptopals/data/Set3Challenge20.txt")

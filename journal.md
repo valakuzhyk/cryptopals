@@ -90,4 +90,4 @@ All that aside, Since I was able to get the solution to these using the statisti
 
 ## Set 3
 ### Challenge 21: Implement MT19937
-
+This was somewhat hard at first, trying to understand what the wikipedia page was communicating. But as I was implementing it, it became much easier to understand the intention of the algorithm, at least on a surface level. I never went into actually learning lie groups and algebras, so I can't say that I understand why they are doing all of these transformations, but I suppose, for now, that isn't the point of this. I have looked ahead in these challenges, and there is more theoretical stuff ahead. I imagine when I get there, deeper understanding will be had.
