@@ -17,6 +17,50 @@ import (
 	"github.com/valakuzhyk/cryptopals/vcipher"
 )
 
+func TestSet3Challenge20(t *testing.T) {
+	absPath, _ := filepath.Abs("../cryptopals/data/Set3Challenge20.txt")
+	file, err := os.Open(absPath)
+	if err != nil {
+		t.Fatal("Unable to open data file")
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	blockCipher, err := aes.NewBlockCipher(utils.GetRandomBytes(16))
+	if err != nil {
+		t.Fatal("Unable to create aes block cipher")
+	}
+
+	minStringSize := 0
+	var originalStrings []string
+	var encryptedStrings []string
+	for scanner.Scan() {
+		str := scanner.Text()
+		strBytes, err := utils.Base64ToBytes(str)
+		if err != nil {
+			log.Fatal(err)
+		}
+		originalStrings = append(originalStrings, strings.TrimSpace(string(strBytes)))
+		ctrEncrypter, err := vcipher.NewCTREncrypter(blockCipher, bytes.Repeat([]byte("\x00"), 8))
+
+		encrypted := make([]byte, len(strBytes))
+		ctrEncrypter.XORKeyStream(encrypted, strBytes)
+		if len(encrypted) < minStringSize {
+			minStringSize = len(encrypted)
+		}
+		encryptedStrings = append(encryptedStrings, string(encrypted))
+	}
+
+	guessedKey := xor.GuessKey(encryptedStrings)
+	encryptedFirstString := encryptedStrings[0]
+	decryptedStringBytes := xor.RepeatingXor([]byte(encryptedFirstString), guessedKey)
+	decryptedString := string(decryptedStringBytes[:len(encryptedFirstString)])
+	// Check the first string
+	if !strings.EqualFold(decryptedString, originalStrings[0]) {
+		t.Fatalf("Unable to decode first string. Got: \n%s\nWant: \n%s\n", decryptedString, originalStrings[0])
+	}
+}
+
 func TestSet3Challenge19(t *testing.T) {
 	absPath, _ := filepath.Abs("../cryptopals/data/Set3Challenge19.txt")
 	file, err := os.Open(absPath)

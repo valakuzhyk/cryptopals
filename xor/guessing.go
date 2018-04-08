@@ -11,7 +11,16 @@ import (
 // against the same key.
 func GuessKey(samples []string) []byte {
 	guessedKey := []byte{}
-	for i := 0; i < 38; i++ {
+
+	// Make your keysize the length of the longest string
+	maxLen := 0
+	for _, s := range samples {
+		if len(s) > maxLen {
+			maxLen = len(s)
+		}
+	}
+
+	for i := 0; i < maxLen; i++ {
 		letter := GuessLetter(samples, i)
 		guessedKey = append(guessedKey, letter)
 	}
@@ -93,7 +102,11 @@ func FindCommonPrefixes(strings []string) []string {
 func allBytesAreText(inputBytes []byte, key byte) bool {
 	for _, b := range inputBytes {
 		newRune := rune(b ^ byte(key))
-		if !(unicode.IsLetter(newRune) || unicode.IsSpace(newRune) || unicode.IsPunct(newRune)) {
+		if !(unicode.IsLetter(newRune) ||
+			unicode.IsSpace(newRune) ||
+			unicode.IsMark(newRune) ||
+			unicode.IsNumber(newRune) ||
+			unicode.IsPunct(newRune)) {
 			return false
 		}
 	}

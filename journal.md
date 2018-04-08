@@ -81,3 +81,13 @@ That being said, the challenge was fairly straightforward.
 ## Set 3
 ### Challenge 19: Break fixed-nonce CTR using substitutions
 I really disliked this challenge. I think its because they are telling me to solve this problem in a suboptimal way, when an early challenge kind of introduced this challenge as another challenge altogether. Either way, this clearly indicates that a fixed nonce can be a problem, yet even changing the nonce and making it public seemingly makes this a safer system. 
+
+## Set 3
+### Challenge 20: Break fixed-nonce CTR statistically
+So I kinda cheated. I used the same solution to challenge 19 as challenge 20. In fact, I tried to use my solution to the XOR challenges earlier, but they were too slow XD In fact, this new strategy that I have of just checking whether the guess transforms characters into valid output outside of the code that scores english seemed to make the solution much easier. I think I very much overthought my XOR solution. However, I think that was because I kept getting the answer wrong because I had forgotten to base64 decode the input :\
+
+All that aside, Since I was able to get the solution to these using the statistical approach using code that I used for the repeating key xor, I don't think that there is any usefulness in structuring the code in a way that it takes the different lines as a single string, rather than a repeating key XOR. The principle has been understood I think though (You can tell how much I want to move on to other kinds of crypto-breakage).
+
+## Set 3
+### Challenge 21: Implement MT19937
+
