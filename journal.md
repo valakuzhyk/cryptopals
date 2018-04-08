@@ -77,3 +77,7 @@ Notice how padding is irrelevant to this strategy. In fact, you should be able t
 I'm intrigued at this mode, its not something that I have read about before, but I like how it makes a block cipher into a stream cipher, while also (seemingly) nullifying the attacks from earlier. Also, it doesn't need both decrypt and encrypt, which is nice.
 
 That being said, the challenge was fairly straightforward.
+
+## Set 3
+### Challenge 19: Break fixed-nonce CTR using substitutions
+I really disliked this challenge. I think its because they are telling me to solve this problem in a suboptimal way, when an early challenge kind of introduced this challenge as another challenge altogether. Either way, this clearly indicates that a fixed nonce can be a problem, yet even changing the nonce and making it public seemingly makes this a safer system. 
