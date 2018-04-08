@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/valakuzhyk/cryptopals/xor"
@@ -38,7 +39,7 @@ func TestSet3Challenge19(t *testing.T) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		originalStrings = append(originalStrings, string(strBytes))
+		originalStrings = append(originalStrings, strings.TrimSpace(string(strBytes)))
 		ctrEncrypter, err := vcipher.NewCTREncrypter(blockCipher, bytes.Repeat([]byte("\x00"), 8))
 
 		encrypted := make([]byte, len(strBytes))
@@ -50,8 +51,8 @@ func TestSet3Challenge19(t *testing.T) {
 	decryptedStringBytes := xor.RepeatingXor([]byte(encryptedFirstString), guessedKey)
 	decryptedString := string(decryptedStringBytes[:len(encryptedFirstString)])
 	// Check the first string
-	if decryptedString != originalStrings[0] {
-		t.Fatal("Unable to decode first string. Got: \n%s\nWant: \n%s\n", decryptedString, originalStrings[0])
+	if !strings.EqualFold(decryptedString, originalStrings[0]) {
+		t.Fatalf("Unable to decode first string. Got: \n%s\nWant: \n%s\n", decryptedString, originalStrings[0])
 	}
 }
 
