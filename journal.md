@@ -91,3 +91,16 @@ All that aside, Since I was able to get the solution to these using the statisti
 ## Set 3
 ### Challenge 21: Implement MT19937
 This was somewhat hard at first, trying to understand what the wikipedia page was communicating. But as I was implementing it, it became much easier to understand the intention of the algorithm, at least on a surface level. I never went into actually learning lie groups and algebras, so I can't say that I understand why they are doing all of these transformations, but I suppose, for now, that isn't the point of this. I have looked ahead in these challenges, and there is more theoretical stuff ahead. I imagine when I get there, deeper understanding will be had.
+
+## Set 3
+### Challenge 22: Crack a MT19937 seed
+This seems like very little guidance. My gut is telling me that I can just guess the unix timestamp by checking the last 1000 seconds after I get my output to find what possible seeds could have returned this number first. However, that seems too easy. However, anything attacking the actual mathematics behind MT19937 seems like it is too hard for this challenge, and not in the spirit of a question using a time stamp. I think the time stamp is being used for a reason here.
+
+I'm concerned that I may have misinterpreted the question, since the way I approached this was quite easy. Perhaps it's one of the easy ones :)
+
+## Set 3
+### Challenge 23: Clone MT19937 RNG from its output
+This was a little more technical, and required a bit more thinking, but still straightforward, and pretty cool! If you didn't know the start of the period, then you can just try 624*2 until you get the 624. It goes to show that this is truly not a cryptographically secure algorithm. The idea for hashing the output seems reasonable. It should also not affect the pseudo-randomness of the generator. I suppose looking at how cryptographically secure random number generators work would give insight onto why hashing may or may not be a good solution to this problem.
+
+## Set 3
+### Challenge 24: Break the MT19937 Stream Cipher

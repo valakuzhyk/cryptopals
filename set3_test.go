@@ -3,11 +3,14 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"crypto/rand"
 	"log"
+	"math/big"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/valakuzhyk/cryptopals/vcipher/vrandom"
 	"github.com/valakuzhyk/cryptopals/xor"
@@ -18,10 +21,44 @@ import (
 	"github.com/valakuzhyk/cryptopals/vcipher"
 )
 
+func TestSet3Challenge23(t *testing.T) {
+	mt := vrandom.NewMersenneTwister(1000)
+	copiedMT := vrandom.RecreateMTFromOutput(mt)
+	for i := 0; i < 624; i++ {
+		got := mt.Rand()
+		want := copiedMT.Rand()
+		if got != want {
+			log.Fatalf("Got %d, want %d", got, want)
+		}
+	}
+}
+
+func TestSet3Challenge22(t *testing.T) {
+	max := 1000
+	min := 40
+	maxIntSize := big.NewInt(int64(max - min))
+	randNum, err := rand.Int(rand.Reader, maxIntSize)
+	if err != nil {
+		log.Fatal("Couldn't generate random number", err)
+	}
+
+	seed := time.Now().Unix() - randNum.Int64()
+	mt := vrandom.NewMersenneTwister(uint32(seed))
+
+	randomNumber := mt.Rand()
+	gotSeed, err := vrandom.CrackMTSeededByRecentTime(vrandom.NewMersenneTwister, randomNumber, 10000)
+	if err != nil {
+		log.Fatal("Got error trying to find seed", err)
+	}
+	if uint32(seed) != gotSeed {
+		log.Fatalf("Wanted %d, got %d", seed, gotSeed)
+	}
+}
+
 func TestSet3Challenge21(t *testing.T) {
 	mt := vrandom.NewMersenneTwister(1)
 
-	// Recived from http://create.stephan-brumme.com/mersenne-twister/
+	// Received from http://create.stephan-brumme.com/mersenne-twister/
 	wantFirst10 := []uint32{
 		0x6AC1F425,
 		0xFF4780EB,
