@@ -21,6 +21,10 @@ import (
 	"github.com/valakuzhyk/cryptopals/vcipher"
 )
 
+func TestSet3Challenge24(t *testing.T) {
+
+}
+
 func TestSet3Challenge23(t *testing.T) {
 	mt := vrandom.NewMersenneTwister(1000)
 	copiedMT := vrandom.RecreateMTFromOutput(mt)
