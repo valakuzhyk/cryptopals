@@ -22,7 +22,23 @@ import (
 )
 
 func TestSet3Challenge24(t *testing.T) {
+	startingBytes := utils.GetRandomBytesBetween(1, 50)
+	controlledBytes := strings.Repeat("A", 14)
 
+	plaintext := append(startingBytes, controlledBytes...)
+
+	seed := utils.GetRandomBytes(2)
+	e, err := vcipher.NewMT19937Encrypter(seed)
+	if err != nil {
+		t.Fatal("Unable to create encrypter", err)
+	}
+
+	encrypted := make([]byte, len(plaintext))
+	e.XORKeyStream(encrypted, plaintext)
+	key := vcipher.BruteForceMT19937(encrypted, 14)
+	if string(key) != string(seed) {
+		t.Fatal("Couldn't brute force it :/")
+	}
 }
 
 func TestSet3Challenge23(t *testing.T) {

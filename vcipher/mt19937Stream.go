@@ -4,6 +4,7 @@ import (
 	"crypto/cipher"
 	"encoding/binary"
 	"log"
+	"math"
 
 	"github.com/valakuzhyk/cryptopals/vcipher/vrandom"
 
@@ -23,10 +24,10 @@ func NewMT19937Encrypter(seed []byte) (cipher.Stream, error) {
 	}
 	seedAsInt := binary.LittleEndian.Uint16(seed)
 
-	return mt19937Encrypter{vrandom.NewMersenneTwister(uint32(seedAsInt))}, nil
+	return &mt19937Encrypter{vrandom.NewMersenneTwister(uint32(seedAsInt))}, nil
 }
 
-func (e mt19937Encrypter) XORKeyStream(dst, src []byte) {
+func (e *mt19937Encrypter) XORKeyStream(dst, src []byte) {
 	if len(dst) < len(src) {
 		panic("your source is larger than your destination. Doesn't work for XORKeyStream")
 	}
@@ -47,4 +48,36 @@ func (e mt19937Encrypter) XORKeyStream(dst, src []byte) {
 	for i, b := range output {
 		dst[i] = b
 	}
+}
+
+// We assume that the key is less than 16 bits, and that we have some controlled
+// plaintext that was appended before being encrypted.
+func BruteForceMT19937(ciphertext []byte, controlledPlaintextLen int) []byte {
+	if controlledPlaintextLen < 8 {
+		log.Fatal("Just tryina make my life a little easier for this silly challenge.")
+	}
+
+	// Find how many bytes were used on the unknown portion
+	lastControlledDwordIndex := (len(ciphertext) / 4) - 1
+	lastControlledDword := ciphertext[lastControlledDwordIndex*4 : (lastControlledDwordIndex+1)*4]
+
+	// We are just assuming here that the controlledPlaintext is all "A"
+	expectedBytes := xor.RepeatingXor(lastControlledDword, []byte("A"))
+	expectedNumber := binary.LittleEndian.Uint32(expectedBytes)
+	expectedIndex := lastControlledDwordIndex
+
+	for i := 0; i < math.MaxUint16; i++ {
+		mt := vrandom.NewMersenneTwister(uint32(i))
+		for i := 0; i < expectedIndex; i++ {
+			mt.Rand()
+		}
+		gotNumber := mt.Rand()
+
+		if gotNumber == expectedNumber {
+			seed := make([]byte, 2)
+			binary.LittleEndian.PutUint16(seed, uint16(i))
+			return seed
+		}
+	}
+	return []byte{}
 }

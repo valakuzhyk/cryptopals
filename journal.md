@@ -72,35 +72,41 @@ Go through all byte modifications of the last byte in the block before the last 
 
 Notice how padding is irrelevant to this strategy. In fact, you should be able to conclude what the final bytes are for blocks in the middle of the message :) just make it the last block by moving all the rest after it.
 
-## Set 3
 ### Challenge 18: Introducing CTR Mode
 I'm intrigued at this mode, its not something that I have read about before, but I like how it makes a block cipher into a stream cipher, while also (seemingly) nullifying the attacks from earlier. Also, it doesn't need both decrypt and encrypt, which is nice.
 
 That being said, the challenge was fairly straightforward.
 
-## Set 3
 ### Challenge 19: Break fixed-nonce CTR using substitutions
 I really disliked this challenge. I think its because they are telling me to solve this problem in a suboptimal way, when an early challenge kind of introduced this challenge as another challenge altogether. Either way, this clearly indicates that a fixed nonce can be a problem, yet even changing the nonce and making it public seemingly makes this a safer system. 
 
-## Set 3
 ### Challenge 20: Break fixed-nonce CTR statistically
 So I kinda cheated. I used the same solution to challenge 19 as challenge 20. In fact, I tried to use my solution to the XOR challenges earlier, but they were too slow XD In fact, this new strategy that I have of just checking whether the guess transforms characters into valid output outside of the code that scores english seemed to make the solution much easier. I think I very much overthought my XOR solution. However, I think that was because I kept getting the answer wrong because I had forgotten to base64 decode the input :\
 
 All that aside, Since I was able to get the solution to these using the statistical approach using code that I used for the repeating key xor, I don't think that there is any usefulness in structuring the code in a way that it takes the different lines as a single string, rather than a repeating key XOR. The principle has been understood I think though (You can tell how much I want to move on to other kinds of crypto-breakage).
 
-## Set 3
 ### Challenge 21: Implement MT19937
 This was somewhat hard at first, trying to understand what the wikipedia page was communicating. But as I was implementing it, it became much easier to understand the intention of the algorithm, at least on a surface level. I never went into actually learning lie groups and algebras, so I can't say that I understand why they are doing all of these transformations, but I suppose, for now, that isn't the point of this. I have looked ahead in these challenges, and there is more theoretical stuff ahead. I imagine when I get there, deeper understanding will be had.
 
-## Set 3
 ### Challenge 22: Crack a MT19937 seed
 This seems like very little guidance. My gut is telling me that I can just guess the unix timestamp by checking the last 1000 seconds after I get my output to find what possible seeds could have returned this number first. However, that seems too easy. However, anything attacking the actual mathematics behind MT19937 seems like it is too hard for this challenge, and not in the spirit of a question using a time stamp. I think the time stamp is being used for a reason here.
 
 I'm concerned that I may have misinterpreted the question, since the way I approached this was quite easy. Perhaps it's one of the easy ones :)
 
-## Set 3
 ### Challenge 23: Clone MT19937 RNG from its output
 This was a little more technical, and required a bit more thinking, but still straightforward, and pretty cool! If you didn't know the start of the period, then you can just try 624*2 until you get the 624. It goes to show that this is truly not a cryptographically secure algorithm. The idea for hashing the output seems reasonable. It should also not affect the pseudo-randomness of the generator. I suppose looking at how cryptographically secure random number generators work would give insight onto why hashing may or may not be a good solution to this problem.
 
-## Set 3
 ### Challenge 24: Break the MT19937 Stream Cipher
+My gut is telling me to brute force the 16 bit key. There doesn't seem to be another way around it. My guess is also that you are pretty sure that this is near the beginning of the key stream, or the first use of the key stream... soooo, seems pretty useless as far as breaking the cipher goes.
+
+I can't tell if they are saying 'recover the "key" (the 16 bit seed)' because they are emphasizing the fact that the seed is 16 bits, or because they want to make it clear the seed is being used as the key.
+
+I looked up a write up for challenge 24, and that's all they did :P This is silly.
+
+And while I think I see where they are going with this password reset token, I think I'm going to move on from this. While I want to stay true to the challenges, this one is fairly vague. I don't know what they mean from "same time". The exact same time? Around the same time? Do you record the time the seed was created and just check whether its one of the first n numbers generated by that seed? Do you check a time range? Either way, those are both things that I have already implemented, so let's not recreate the wheel.
+
+That was irony, since I am literally doing things that many people already have on their github accounts :) Let's move on already.
+
+## Set 4
+### Challenge 25: Break "random access read/write" AES CTR
+
