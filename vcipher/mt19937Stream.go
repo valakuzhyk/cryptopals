@@ -27,7 +27,7 @@ func NewMT19937Encrypter(seed []byte) (cipher.Stream, error) {
 	return &mt19937Encrypter{vrandom.NewMersenneTwister(uint32(seedAsInt))}, nil
 }
 
-func (e *mt19937Encrypter) XORKeyStream(dst, src []byte) {
+func (e mt19937Encrypter) XORKeyStream(dst, src []byte) {
 	if len(dst) < len(src) {
 		panic("your source is larger than your destination. Doesn't work for XORKeyStream")
 	}
