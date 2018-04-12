@@ -1,6 +1,7 @@
 package vcipher
 
 import (
+	"bytes"
 	"crypto/cipher"
 	"encoding/binary"
 	"log"
@@ -26,6 +27,7 @@ func NewCTREncrypter(block cipher.Block, nonce []byte) (cipher.Stream, error) {
 
 func (e ctrEncrypter) XORKeyStream(dst, src []byte) {
 	if len(dst) < len(src) {
+		log.Printf("dest: %d, src: %d", len(dst), len(src))
 		panic("your source is larger than your destination. Doesn't work for XORKeyStream")
 	}
 
@@ -49,4 +51,16 @@ func (e ctrEncrypter) XORKeyStream(dst, src []byte) {
 	for i, b := range output {
 		dst[i] = b
 	}
+}
+
+// EditCiphertext replaces old ciphertext with new text you control.
+func EditCiphertext(ciphertext []byte, ctrEncrypter cipher.Stream, offset int, newtext []byte) []byte {
+	// We can resuse the XORKeyStream code if we prefix the desired string, and
+	// append the encrypted part to the end.
+	toEncrypt := append(bytes.Repeat([]byte("A"), offset), newtext...)
+	newCiphertext := make([]byte, len(toEncrypt))
+	ctrEncrypter.XORKeyStream(newCiphertext, toEncrypt)
+
+	newCiphertext = append(ciphertext[:offset], newCiphertext[offset:]...)
+	return newCiphertext
 }
