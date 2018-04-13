@@ -111,3 +111,8 @@ That was irony, since I am literally doing things that many people already have 
 ### Challenge 25: Break "random access read/write" AES CTR
 In this challenge, they give a file, suggesting the file is from the ECB exercise. However, it is different. However, when you try the ECB file decryption, the first block is still the same. I don't know if this is a mistake on their part, I am misunderstanding the question, or somehow downloaded an incorrect file. Either way, I think the punchline of this has been understood. Definitely do not reuse a nonce, since a controlled plaintext attack will completely ruin your day!
 
+## Set 4
+### Challenge 26: CTR "Bitflipping"
+Yeahhhhh, so. You just xor what you want. Where you want. If you have control of the plaintext, and you know where it is, you win...
+Am I missing something? I think this is just to drive the point home, but I am surprised if this is a realistic scenario. Cuz this is super easy...
+

@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/valakuzhyk/cryptopals/data"
@@ -13,6 +14,53 @@ import (
 	"github.com/valakuzhyk/cryptopals/utils"
 	"github.com/valakuzhyk/cryptopals/vcipher"
 )
+
+func TestSet4Challenge2(t *testing.T) {
+	// CBC Bitflipping
+	e := vcipher.AppendEncrypter{}
+	e.Key = []byte("ASDFGHJKLQWERTYU")
+	e.IV = []byte("12345678")
+	startBytes := []byte("comment1=cooking%20MCs;userdata=")
+	e.SetBeginBytes(startBytes)
+	e.SetEndBytes([]byte(";comment2=%20like%20a%20pound%20of%20bacon"))
+	e.SetEncryptionMode(vcipher.CTR)
+
+	// This is our scratch space. We will scramble the first block that we write,
+	// by modifying it with our desired message. This will insert our message into the next block.
+	desiredInput := "v;admin=true"
+	input := strings.Repeat("\x00", len(desiredInput))
+
+	// This is the step that prevents you from just specifying you are admin.
+	input = strings.Replace(input, ";", "", -1)
+	input = strings.Replace(input, "=", "", -1)
+	encryptedInput := e.Encrypt([]byte(input))
+
+	// Time to simply xor our message in... seems way too easy.
+	offset := len(startBytes)
+	for i := 0; i < len(input); i++ {
+		encryptedInput[i+offset] ^= desiredInput[i]
+	}
+
+	e.SetBeginBytes([]byte{})
+	e.SetEndBytes([]byte{})
+	unencryptedData := e.Encrypt(encryptedInput)
+	log.Println(string(unencryptedData))
+
+	propertyMap := map[string]string{}
+	tuples := strings.Split(string(unencryptedData), ";")
+	for _, tuple := range tuples {
+		log.Println(tuple)
+		keyValue := strings.Split(tuple, "=")
+		if len(keyValue) != 2 {
+			t.Fatalf("Invalid format %s", tuple)
+		}
+		propertyMap[keyValue[0]] = keyValue[1]
+	}
+	log.Println(propertyMap)
+	if propertyMap["admin"] != "true" {
+		t.Fatal("Unfortunate. You had so much potential.")
+	}
+}
 
 func TestSet4Challenge25(t *testing.T) {
 	absPath, err := filepath.Abs("../cryptopals/data/Set2Challenge10.txt")
