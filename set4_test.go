@@ -9,13 +9,53 @@ import (
 	"testing"
 
 	"github.com/valakuzhyk/cryptopals/data"
+	"github.com/valakuzhyk/cryptopals/xor"
 
 	"github.com/valakuzhyk/cryptopals/aes"
 	"github.com/valakuzhyk/cryptopals/utils"
 	"github.com/valakuzhyk/cryptopals/vcipher"
 )
 
-func TestSet4Challenge2(t *testing.T) {
+func TestSet4Challenge27(t *testing.T) {
+	// CBC Key as IV
+	e := vcipher.AppendEncrypter{}
+	e.Key = []byte("ASDFGHJKLQWERTYU")
+	e.IV = e.Key
+	e.SetEncryptionMode(vcipher.CBC_ENCODE)
+
+	blockSize := vcipher.CalculateBlockSize(e.Encrypt)
+
+	// This is our scratch space. We will scramble the first block that we write,
+	// by modifying it with our desired message. This will insert our message into the next block.
+	input := []byte(strings.Repeat("A", blockSize*3))
+
+	encryptedInput := e.Encrypt(input)
+
+	block := utils.GetNthBlock(encryptedInput, 1, blockSize)
+	zeroBlock := bytes.Repeat([]byte{0}, blockSize)
+	constructedCiphertext := append(
+		block,
+		append(zeroBlock, block...)...)
+
+	e.SetEncryptionMode(vcipher.CBC_DECODE)
+	e.SetBeginBytes([]byte{})
+	e.SetEndBytes([]byte{})
+	unencryptedData := e.Encrypt(constructedCiphertext)
+	log.Println(string(unencryptedData))
+	if utils.IsValidASCII(unencryptedData) {
+		t.Fatal("Didn't cause an error, so it did not disclose the key")
+	}
+	firstDecodedBlock := utils.GetNthBlock(unencryptedData, 0, blockSize)
+	lastDecodedBlock := utils.GetNthBlock(unencryptedData, 2, blockSize)
+	calculatedKey := xor.Xor(firstDecodedBlock, lastDecodedBlock)
+	log.Println(string(calculatedKey))
+
+	if string(e.Key) != string(calculatedKey) {
+		t.Fatal("Unfortunate. You had so much potential.")
+	}
+}
+
+func TestSet4Challenge26(t *testing.T) {
 	// CBC Bitflipping
 	e := vcipher.AppendEncrypter{}
 	e.Key = []byte("ASDFGHJKLQWERTYU")

@@ -107,12 +107,22 @@ And while I think I see where they are going with this password reset token, I t
 
 That was irony, since I am literally doing things that many people already have on their github accounts :) Let's move on already.
 
-## Set 4
+
 ### Challenge 25: Break "random access read/write" AES CTR
 In this challenge, they give a file, suggesting the file is from the ECB exercise. However, it is different. However, when you try the ECB file decryption, the first block is still the same. I don't know if this is a mistake on their part, I am misunderstanding the question, or somehow downloaded an incorrect file. Either way, I think the punchline of this has been understood. Definitely do not reuse a nonce, since a controlled plaintext attack will completely ruin your day!
 
-## Set 4
+
 ### Challenge 26: CTR "Bitflipping"
 Yeahhhhh, so. You just xor what you want. Where you want. If you have control of the plaintext, and you know where it is, you win...
 Am I missing something? I think this is just to drive the point home, but I am surprised if this is a realistic scenario. Cuz this is super easy...
+
+
+### Challenge 27: Recovering the key from CBC where IV = key  
+I have been putting this one off because it seems too straightforward. Oh well. 
+The first one is essentially the same as the third one except the first one has the key xored with it.
+Xoring these two will leave the key.
+
+I believe that there is a chance that none of the bytes in the plaintext are above the threshold. I'm not sure if there is a validation step in the encryption step. Depending on that, and whether it decrypts a block at a time and then stops when it is invalidated. Either way, I believe you can force there to be a byte that is above the threshold by controlling the plaintext. I'll move on though since hte punchline is understood.
+
+### Challenge 28: Get SHA-1 Working
 

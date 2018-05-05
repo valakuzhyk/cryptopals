@@ -94,7 +94,7 @@ func TestSet3Challenge21(t *testing.T) {
 	for i, want := range wantFirst10 {
 		got := mt.Rand()
 		if want != got {
-			log.Fatal("%d iteration, want %x, got %x", i, want, got)
+			log.Fatalf("%d iteration, want %x, got %x", i, want, got)
 		}
 	}
 }
