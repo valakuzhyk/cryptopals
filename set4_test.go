@@ -18,11 +18,46 @@ import (
 	"github.com/valakuzhyk/cryptopals/vcipher"
 )
 
+func TestSet4Challenge29(t *testing.T) {
+	// Crack SHA-1 MAC
+	key := "YELLOW"
+	message := "comment1=cooking%20MCs;userdata=foo;comment2=%20like%20a%20pound%20of%20bacon"
+	log.Println("Original message hash")
+	mac := sha1.MAC(key, message)
+
+	log.Println("Corrupted message hash")
+	desiredMessage := ";admin=true"
+	potentialSolutions := sha1.BreakSHA1KeyedMAC(message, desiredMessage, mac, 5, 10)
+
+	// Ensure that one of the messages matches the generated MAC
+	log.Println("Verifying MAC value")
+	MACAndMessage := potentialSolutions[len(key)]
+	gotMAC := sha1.MAC(key, MACAndMessage.Message)
+	if string(gotMAC) != string(MACAndMessage.MAC) {
+		log.Fatal("The MAC and the message do not match up.")
+	}
+
+	propertyMap := map[string]string{}
+	tuples := strings.Split(MACAndMessage.Message, ";")
+	for _, tuple := range tuples {
+		log.Println(tuple)
+		keyValue := strings.Split(tuple, "=")
+		if len(keyValue) != 2 {
+			t.Fatalf("Invalid format %s", tuple)
+		}
+		propertyMap[keyValue[0]] = keyValue[1]
+	}
+	log.Println(propertyMap)
+	if propertyMap["admin"] != "true" {
+		t.Fatal("Unfortunate. You had so much potential.")
+	}
+}
+
 func TestSet4Challenge28(t *testing.T) {
 	// Implement SHA-1 MAC
 	got := sha1.MAC(
-		[]byte("The quick"),
-		[]byte(" brown fox jumps over the lazy dog"))
+		"The quick",
+		" brown fox jumps over the lazy dog")
 	gotHexString := hex.EncodeToString(got)
 	if gotHexString != "2fd4e1c67a2d28fced849ee1bb76e7391b93eb12" {
 		t.Fatal("Computation of the sha1 hash failed.")

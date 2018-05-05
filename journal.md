@@ -125,4 +125,10 @@ Xoring these two will leave the key.
 I believe that there is a chance that none of the bytes in the plaintext are above the threshold. I'm not sure if there is a validation step in the encryption step. Depending on that, and whether it decrypts a block at a time and then stops when it is invalidated. Either way, I believe you can force there to be a byte that is above the threshold by controlling the plaintext. I'll move on though since hte punchline is understood.
 
 ### Challenge 28: Get SHA-1 Working
+This is pretty straightforward, just following the implementation on wikipedia. They even have a nice example to validate my code with.
 
+### Challenge 29: Break SHA-1 keyed MAC
+
+This challenge has a few details that are more difficult to get working.
+
+Just getting the MAC of a string that has that ending is only one challenge. Generating the potential string itself is a bit harder. Applying my experience that using a struct to keep track of related data has helped out a lot. The ValidatedMessage struct saved a lot of coordination hassle.
