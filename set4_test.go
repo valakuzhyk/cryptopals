@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/hex"
 	"io/ioutil"
 	"log"
 	"path/filepath"
@@ -9,12 +10,24 @@ import (
 	"testing"
 
 	"github.com/valakuzhyk/cryptopals/data"
+	"github.com/valakuzhyk/cryptopals/sha1"
 	"github.com/valakuzhyk/cryptopals/xor"
 
 	"github.com/valakuzhyk/cryptopals/aes"
 	"github.com/valakuzhyk/cryptopals/utils"
 	"github.com/valakuzhyk/cryptopals/vcipher"
 )
+
+func TestSet4Challenge28(t *testing.T) {
+	// Implement SHA-1 MAC
+	got := sha1.MAC(
+		[]byte("The quick"),
+		[]byte(" brown fox jumps over the lazy dog"))
+	gotHexString := hex.EncodeToString(got)
+	if gotHexString != "2fd4e1c67a2d28fced849ee1bb76e7391b93eb12" {
+		t.Fatal("Computation of the sha1 hash failed.")
+	}
+}
 
 func TestSet4Challenge27(t *testing.T) {
 	// CBC Key as IV

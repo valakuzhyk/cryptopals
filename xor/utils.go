@@ -1,10 +1,11 @@
 package xor
 
-import "log"
-import "runtime/debug"
+import (
+	"log"
+	"runtime/debug"
+)
 
-// Xor returns the xor of two, same size byte lists.
-func Xor(b1, b2 []byte) []byte {
+func xorPair(b1, b2 []byte) []byte {
 	if len(b1) != len(b2) {
 		debug.PrintStack()
 		log.Fatalf("Buffers do not match, cannot compute xor, %d vs %d\n", len(b1), len(b2))
@@ -12,6 +13,15 @@ func Xor(b1, b2 []byte) []byte {
 	output := make([]byte, len(b1))
 	for i := range b1 {
 		output[i] = b1[i] ^ b2[i]
+	}
+	return output
+}
+
+// Xor returns the xor of any number of smae size arrays.
+func Xor(bArrays ...[]byte) []byte {
+	output := []byte{}
+	for _, array := range bArrays {
+		output = xorPair(output, array)
 	}
 	return output
 }

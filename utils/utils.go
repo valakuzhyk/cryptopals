@@ -39,6 +39,20 @@ func GetNthBlock(input []byte, n, blockSize int) []byte {
 	return input[n*blockSize : (n+1)*blockSize]
 }
 
+// Blockify returns a list of the blocks that are made from the input.
+func Blockify(input []byte, blockSize int) ([][]byte, error) {
+	numBytes := len(input)
+	if numBytes%blockSize != 0 {
+		return nil, fmt.Errorf("The length of the input (%d) is not a multiple of the blocksize %d", numBytes, blockSize)
+	}
+	numBlocks := numBytes / blockSize
+	output := [][]byte{}
+	for i := 0; i < numBlocks; i++ {
+		output = append(output, GetNthBlock(input, i, blockSize))
+	}
+	return output, nil
+}
+
 // FirstBlockDiff returns the first block that is different between the inputs.
 // if they are the same, return -1
 func FirstBlockDiff(input1, input2 []byte, blockSize int) int {
