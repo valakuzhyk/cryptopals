@@ -18,6 +18,11 @@ import (
 	"github.com/valakuzhyk/cryptopals/vcipher"
 )
 
+func TestSet4Challenge30(t *testing.T) {
+	// Crack MD4 keyed MAC
+
+}
+
 func TestSet4Challenge29(t *testing.T) {
 	// Crack SHA-1 MAC
 	key := "YELLOW"
