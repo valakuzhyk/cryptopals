@@ -16,12 +16,6 @@ func MAC(key, message []byte) []byte {
 
 // Hash returns the hash of key || message
 func Hash(message []byte) []byte {
-	h0 := uint32(0x67452301)
-	h1 := uint32(0xEFCDAB89)
-	h2 := uint32(0x98BADCFE)
-	h3 := uint32(0x10325476)
-	h4 := uint32(0xC3D2E1F0)
-
 	ml := len(message)
 
 	// TODO Preprocessing
@@ -42,63 +36,90 @@ func Hash(message []byte) []byte {
 		log.Fatal("Issue with the padding step: ", err)
 	}
 
+	calc := newDefaultCalculator()
 	for _, block := range blocks {
-		log.Println("Working on this block")
-		words, _ := utils.Blockify(block, 4)
-		// convert words to ints to make easier to process.
-		w := []uint32{}
-		for i := 0; i < 80; i++ {
-			if i < 16 {
-				w = append(w, binary.BigEndian.Uint32(words[i]))
-			} else {
-				newWord := w[i-3] ^ w[i-8] ^ w[i-14] ^ w[i-16]
-				newWord = bits.RotateLeft32(newWord, 1)
-				w = append(w, newWord)
-			}
-		}
-
-		a := h0
-		b := h1
-		c := h2
-		d := h3
-		e := h4
-
-		for i, word := range w {
-			log.Println("Working on this word in main loop ", i)
-
-			var k, f uint32
-			if i <= 19 {
-				f = (b & c) | ((^b) & d)
-				k = 0x5A827999
-			} else if i <= 39 {
-				f = b ^ c ^ d
-				k = 0x6ED9EBA1
-			} else if i <= 59 {
-				f = (b & c) | (b & d) | (c & d)
-				k = 0x8F1BBCDC
-			} else {
-				f = b ^ c ^ d
-				k = 0xCA62C1D6
-			}
-
-			temp := bits.RotateLeft32(a, 5) + f + e + k + word
-			e = d
-			d = c
-			c = bits.RotateLeft32(b, 30)
-			b = a
-			a = temp
-		}
-		h0 = h0 + a
-		h1 = h1 + b
-		h2 = h2 + c
-		h3 = h3 + d
-		h4 = h4 + e
+		calc.computeBlock(block)
 	}
+	return calc.dumpState()
+}
+
+// Calculator computes the result of a block in the SHA1 algorithm
+type Calculator struct {
+	h0, h1, h2, h3, h4 uint32
+}
+
+// newDefaultCalculator returns the default calculator used in the normal SHA1
+// hashing routine.
+func newDefaultCalculator() Calculator {
+	return Calculator{
+		h0: 0x67452301,
+		h1: 0xEFCDAB89,
+		h2: 0x98BADCFE,
+		h3: 0x10325476,
+		h4: 0xC3D2E1F0,
+	}
+}
+
+// dumpState return the output of the SHA1 hashing routine.
+func (calc Calculator) dumpState() []byte {
 	output := make([]byte, 4*5)
-	binary.BigEndian.PutUint32(output[4*0:], h0)
-	binary.BigEndian.PutUint32(output[4*1:], h1)
-	binary.BigEndian.PutUint32(output[4*2:], h2)
-	binary.BigEndian.PutUint32(output[4*3:], h3)
-	binary.BigEndian.PutUint32(output[4*4:], h4)
+	binary.BigEndian.PutUint32(output[4*0:], calc.h0)
+	binary.BigEndian.PutUint32(output[4*1:], calc.h1)
+	binary.BigEndian.PutUint32(output[4*2:], calc.h2)
+	binary.BigEndian.PutUint32(output[4*3:], calc.h3)
+	binary.BigEndian.PutUint32(output[4*4:], calc.h4)
 	return output
+}
+
+// computeBlock changes the state of the calculator according to the block given.
+func (calc *Calculator) computeBlock(block []byte) {
+	words, _ := utils.Blockify(block, 4)
+	// convert words to ints to make easier to process.
+	w := []uint32{}
+	for i := 0; i < 80; i++ {
+		if i < 16 {
+			w = append(w, binary.BigEndian.Uint32(words[i]))
+		} else {
+			newWord := w[i-3] ^ w[i-8] ^ w[i-14] ^ w[i-16]
+			newWord = bits.RotateLeft32(newWord, 1)
+			w = append(w, newWord)
+		}
+	}
+
+	a := calc.h0
+	b := calc.h1
+	c := calc.h2
+	d := calc.h3
+	e := calc.h4
+
+	for i, word := range w {
+		log.Println("Working on this word in main loop ", i)
+
+		var k, f uint32
+		if i <= 19 {
+			f = (b & c) | ((^b) & d)
+			k = 0x5A827999
+		} else if i <= 39 {
+			f = b ^ c ^ d
+			k = 0x6ED9EBA1
+		} else if i <= 59 {
+			f = (b & c) | (b & d) | (c & d)
+			k = 0x8F1BBCDC
+		} else {
+			f = b ^ c ^ d
+			k = 0xCA62C1D6
+		}
+
+		temp := bits.RotateLeft32(a, 5) + f + e + k + word
+		e = d
+		d = c
+		c = bits.RotateLeft32(b, 30)
+		b = a
+		a = temp
+	}
+	calc.h0 = calc.h0 + a
+	calc.h1 = calc.h1 + b
+	calc.h2 = calc.h2 + c
+	calc.h3 = calc.h3 + d
+	calc.h4 = calc.h4 + e
 }

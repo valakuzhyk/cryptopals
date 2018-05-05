@@ -19,7 +19,7 @@ func TestSHA1(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := SHA1(tt.args.message)
+			got := Hash(tt.args.message)
 			gotHexString := hex.EncodeToString(got)
 			if gotHexString != tt.want {
 				t.Errorf("SHA1() = %v, want %v", gotHexString, tt.want)
