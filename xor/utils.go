@@ -19,7 +19,10 @@ func xorPair(b1, b2 []byte) []byte {
 
 // Xor returns the xor of any number of smae size arrays.
 func Xor(bArrays ...[]byte) []byte {
-	output := []byte{}
+	if len(bArrays) == 0 {
+		return []byte{}
+	}
+	output := make([]byte, len(bArrays[0]))
 	for _, array := range bArrays {
 		output = xorPair(output, array)
 	}
