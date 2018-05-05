@@ -41,15 +41,18 @@ func DecodeCBCWithPaddingOracle(iv, ciphertext []byte, oracle Oracle) []byte {
 	blockSize := len(iv)
 	decodedBlocks := []byte{}
 
+	blocks, err := utils.Blockify(ciphertext, blockSize)
+	if err != nil {
+		log.Fatal("Ciphertext is not a multiple of the block size: ", err)
+	}
+
 	// Special case the first block
 	decodedBlocks = append(decodedBlocks,
-		decodeCBCBlockWithPaddingOracle(iv, ciphertext[0:blockSize], oracle)...)
+		decodeCBCBlockWithPaddingOracle(iv, blocks[0], oracle)...)
 
-	for i := 1; i < len(ciphertext)/blockSize; i++ {
-		previousBlock := utils.GetNthBlock(ciphertext, i-1, blockSize)
-		block := utils.GetNthBlock(ciphertext, i, blockSize)
+	for i := 1; i < len(blocks); i++ {
 		decodedBlocks = append(decodedBlocks,
-			decodeCBCBlockWithPaddingOracle(previousBlock, block, oracle)...)
+			decodeCBCBlockWithPaddingOracle(blocks[i-1], blocks[i], oracle)...)
 	}
 	_, depaddedString := utils.RemovePKCS7Padding(string(decodedBlocks), blockSize)
 
