@@ -18,6 +18,50 @@ import (
 	"github.com/valakuzhyk/cryptopals/vcipher"
 )
 
+func TestSet4Challenge31(t *testing.T) {
+	// Timing based attack of SHA1
+	// server := webserver.StartHTTPServer()
+	// defer func() {
+	// 	err := server.Shutdown(nil)
+	// 	if err != nil {
+	// 		t.Fatal("Problem exiting server: ", err)
+	// 	}
+	// }()
+
+	// file := "demoFile"
+
+	// requestSender := func(input string) time.Duration {
+	// 	fullInput := "http://localhost:8080/challenge31?file=" + file + "&signature=" + input
+	// 	start := time.Now()
+	// 	resp, err := http.Get(fullInput)
+	// 	resp.Body.Close()
+	// 	duration := time.Since(start)
+	// 	if err != nil {
+	// 		log.Println("Got error: ", err)
+	// 	}
+	// 	return duration
+	// }
+
+	// mac := crack.GuessArgBasedOnDelay(requestSender, 20)
+
+	// // Send a presumably correct message
+	// fullInput := "http://localhost:8080/challenge31?file=" + file + "&signature=" + hex.EncodeToString(mac)
+	// resp, err := http.Get(fullInput)
+	// if err != nil {
+	// 	log.Fatal("Got error in response: ", err)
+	// }
+
+	// buffer := make([]byte, 100)
+	// _, err = resp.Body.Read(buffer)
+	// defer resp.Body.Close()
+	// if err != nil && err != io.EOF {
+	// 	log.Fatal("couldn't read buffer", err)
+	// }
+
+	// log.Fatal("Body was: ", string(buffer))
+
+}
+
 func TestSet4Challenge30(t *testing.T) {
 	// Crack MD4 keyed MAC
 
